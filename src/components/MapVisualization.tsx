@@ -43,6 +43,13 @@ export const MapVisualization = ({
     }
   }, [zoomToCoordinates]);
 
+  // Set zoom applied when coordinates are being used
+  useEffect(() => {
+    if (zoomToCoordinates && !zoomApplied) {
+      setZoomApplied(true);
+    }
+  }, [zoomToCoordinates, zoomApplied]);
+
   const getTransformedCoordinates = (lat: number, long: number) => {
     if (!zoomToCoordinates) {
       return projectLatLongToXY(lat, long, dimensions.width, dimensions.height);
@@ -63,8 +70,6 @@ export const MapVisualization = ({
     
     const dx = baseX - zoomCenterX;
     const dy = baseY - zoomCenterY;
-    
-    setZoomApplied(true);
     
     return [
       centerX + dx * scale,

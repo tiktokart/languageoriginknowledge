@@ -1,7 +1,9 @@
+
 import { Language } from '@/lib/walsData';
 import { getFamilyColor } from '@/utils/languageColors';
 import { X, BookOpen, History } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
 
 interface InfoPanelProps {
   language: Language | null;
@@ -99,11 +101,21 @@ export const InfoPanel = ({ language, onClose }: InfoPanelProps) => {
       <div className="mt-4 bg-white/10 rounded p-3 mb-4">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold">Historical Information</h3>
-          <PopoverTrigger asChild>
-            <div className="hover:bg-white/20 p-1 rounded-full transition-colors cursor-pointer">
-              <BookOpen size={16} />
-            </div>
-          </PopoverTrigger>
+          <Popover>
+            <PopoverTrigger asChild>
+              <div className="hover:bg-white/20 p-1 rounded-full transition-colors cursor-pointer">
+                <BookOpen size={16} />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 bg-black/90 text-white border-white/20">
+              <div className="p-2">
+                <h4 className="font-semibold">Language Family History</h4>
+                <p className="text-xs opacity-80 mt-1">
+                  Data sourced from linguistic historical records maintained by academic institutions including Columbia University and the Max Planck Institute.
+                </p>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="space-y-2 text-sm">
           <div>

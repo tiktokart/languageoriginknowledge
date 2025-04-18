@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { Language } from '@/lib/walsData';
 import { projectLatLongToXY } from '@/utils/mapProjection';
@@ -25,7 +24,7 @@ export const MapVisualization = ({
   const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
   const animationRef = useRef<number | null>(null);
   
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(1.3);
   
   useEffect(() => {
     const updateDimensions = () => {

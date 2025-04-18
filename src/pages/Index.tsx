@@ -48,13 +48,27 @@ const Index = () => {
     const familyLanguages = languages.filter(lang => lang.family === family);
     if (familyLanguages.length === 0) return;
     
-    const avgLat = familyLanguages.reduce((sum, lang) => sum + lang.latitude, 0) / familyLanguages.length;
-    const avgLong = familyLanguages.reduce((sum, lang) => sum + lang.longitude, 0) / familyLanguages.length;
+    const lats = familyLanguages.map(lang => lang.latitude);
+    const longs = familyLanguages.map(lang => lang.longitude);
+    
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLong = Math.min(...longs);
+    const maxLong = Math.max(...longs);
+    
+    const avgLat = (minLat + maxLat) / 2;
+    const avgLong = (minLong + maxLong) / 2;
+    
+    const latSpread = maxLat - minLat;
+    const longSpread = maxLong - minLong;
+    const maxSpread = Math.max(latSpread, longSpread);
+    
+    const scale = Math.max(0.8, Math.min(2.5, 5 / maxSpread));
     
     setZoomToCoordinates({
       centerLat: avgLat,
       centerLong: avgLong,
-      scale: 2.5
+      scale: scale
     });
   };
 

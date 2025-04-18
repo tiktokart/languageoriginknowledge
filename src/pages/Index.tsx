@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { fetchWalsLanguages, Language } from '@/lib/walsData';
 import { FilterControls } from '@/components/FilterControls';
@@ -49,11 +48,9 @@ const Index = () => {
     const familyLanguages = languages.filter(lang => lang.family === family);
     if (familyLanguages.length === 0) return;
     
-    // Calculate the average coordinates for the language family
     const avgLat = familyLanguages.reduce((sum, lang) => sum + lang.latitude, 0) / familyLanguages.length;
     const avgLong = familyLanguages.reduce((sum, lang) => sum + lang.longitude, 0) / familyLanguages.length;
     
-    // Set zoom coordinates with a higher scale for better visibility
     setZoomToCoordinates({
       centerLat: avgLat,
       centerLong: avgLong,
@@ -61,10 +58,8 @@ const Index = () => {
     });
   };
 
-  // Region zooming functionality
   useEffect(() => {
     if (selectedArea && !zoomToCoordinates) {
-      // Default coordinates for regions
       const regionCoordinates: Record<string, { lat: number; long: number; scale: number }> = {
         'Africa': { lat: 5, long: 20, scale: 2 },
         'Europe': { lat: 50, long: 10, scale: 2.5 },
@@ -85,14 +80,12 @@ const Index = () => {
     }
   }, [selectedArea]);
   
-  // Reset zoom when family is cleared
   useEffect(() => {
     if (!selectedFamily && !selectedArea) {
       setZoomToCoordinates(null);
     }
   }, [selectedFamily, selectedArea]);
 
-  // Filter languages based on selected family and area
   useEffect(() => {
     let filtered = languages;
     
@@ -133,7 +126,6 @@ const Index = () => {
     setFilteredLanguages(filtered);
   }, [selectedFamily, selectedArea, languages]);
   
-  // Loading screen
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-slate-900 text-white">
@@ -194,10 +186,11 @@ const Index = () => {
                   World Atlas of Language Structures
                 </h1>
                 <CollapsibleTrigger className="rounded-full hover:bg-white/10 p-1 transition-colors">
-                  {({ open }) => open ? 
-                    <MinusCircle className="h-5 w-5 text-white/80" /> : 
-                    <PlusCircle className="h-5 w-5 text-white/80" />
-                  }
+                  {isOpen => (
+                    isOpen ? 
+                      <MinusCircle className="h-5 w-5 text-white/80" /> : 
+                      <PlusCircle className="h-5 w-5 text-white/80" />
+                  )}
                 </CollapsibleTrigger>
               </div>
               

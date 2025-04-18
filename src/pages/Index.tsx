@@ -144,11 +144,14 @@ const Index = () => {
         setSelectedArea={setSelectedArea}
       />
       
-      <InfoPanel language={selectedLanguage} />
+      <InfoPanel 
+        language={selectedLanguage} 
+        onClose={() => setSelectedLanguage(null)} 
+      />
       
       <StatsDisplay languages={filteredLanguages} />
       
-      <div className="absolute bottom-4 left-4 text-white bg-black/60 p-3 rounded backdrop-blur-md border border-white/10 shadow-xl z-10">
+      <div className="absolute bottom-4 left-4 text-white bg-black/60 p-3 rounded backdrop-blur-md border border-white/10 shadow-xl z-10 max-w-md">
         <h1 className="text-2xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200">
           World Atlas of Language Structures
         </h1>

@@ -52,7 +52,6 @@ export const MapVisualization = ({
       setZoomApplied(true);
       setZoom(zoomToCoordinates.scale);
       
-      // Calculate rotation based on longitude to center the view
       const targetLongitude = zoomToCoordinates.centerLong;
       setRotation(prev => ({
         x: prev.x,
@@ -94,7 +93,7 @@ export const MapVisualization = ({
       const deltaY = e.clientY - lastMousePosition.y;
       
       setRotation(prev => ({
-        x: prev.x + deltaY * 0.5,
+        x: Math.max(-45, Math.min(45, prev.x + deltaY * 0.5)),
         y: prev.y + deltaX * 0.5
       }));
       

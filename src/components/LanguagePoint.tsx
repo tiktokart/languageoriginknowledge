@@ -43,7 +43,7 @@ export const LanguagePoint = ({ x, y, language, isSelected, onClick }: LanguageP
         e.stopPropagation();
         onClick();
       }}
-      title={`${language.name} (${language.family}) - ${typeof language.speakers === 'number' ? language.speakers : 'Unknown'} speakers`}
+      title={`${language.name} (${language.family}) - ${typeof language.speakers === 'number' ? language.speakers.toLocaleString() : 'Unknown'} speakers`}
     />
   );
 };

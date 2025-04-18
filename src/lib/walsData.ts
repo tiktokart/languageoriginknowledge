@@ -1,4 +1,3 @@
-
 // WALS (World Atlas of Language Structures) data service
 // This handles loading and processing language data
 
@@ -13,6 +12,7 @@ export type Language = {
   macroarea?: string;
   countryCode?: string;
   features?: Record<string, any>;
+  speakers?: number; // Add speakers property as optional
 };
 
 // Actual WALS categories for language features

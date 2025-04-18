@@ -186,11 +186,8 @@ const Index = () => {
                   World Atlas of Language Structures
                 </h1>
                 <CollapsibleTrigger className="rounded-full hover:bg-white/10 p-1 transition-colors">
-                  {isOpen => (
-                    isOpen ? 
-                      <MinusCircle className="h-5 w-5 text-white/80" /> : 
-                      <PlusCircle className="h-5 w-5 text-white/80" />
-                  )}
+                  <MinusCircle className="h-5 w-5 text-white/80 collapsible-minus-icon" />
+                  <PlusCircle className="h-5 w-5 text-white/80 collapsible-plus-icon hidden" />
                 </CollapsibleTrigger>
               </div>
               

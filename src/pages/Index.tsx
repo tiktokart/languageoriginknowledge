@@ -6,6 +6,7 @@ import { MapVisualization } from '@/components/MapVisualization';
 import { MacroareaFilter } from '@/components/MacroareaFilter';
 import { InfoPanel } from '@/components/InfoPanel';
 import { StatsDisplay } from '@/components/StatsDisplay';
+import { SearchBar } from '@/components/SearchBar';
 
 const Index = () => {
   const [languages, setLanguages] = useState<Language[]>([]);
@@ -132,6 +133,11 @@ const Index = () => {
         zoomToCoordinates={zoomToCoordinates}
       />
       
+      <SearchBar 
+        languages={languages}
+        onSelectLanguage={setSelectedLanguage}
+      />
+      
       <FilterControls 
         families={families}
         selectedFamily={selectedFamily}
@@ -139,33 +145,41 @@ const Index = () => {
         onZoomToFamily={handleZoomToFamily}
       />
       
-      <MacroareaFilter
-        selectedArea={selectedArea}
-        setSelectedArea={setSelectedArea}
-      />
+      <div className="fixed left-0 bottom-0 w-full flex items-end justify-between p-4 pointer-events-none">
+        <div className="pointer-events-auto">
+          <MacroareaFilter
+            selectedArea={selectedArea}
+            setSelectedArea={setSelectedArea}
+          />
+        </div>
+        
+        <div className="pointer-events-auto max-w-md">
+          <div className="bg-black/60 p-3 rounded backdrop-blur-md border border-white/10 shadow-xl">
+            <h1 className="text-2xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200">
+              World Atlas of Language Structures
+            </h1>
+            <p className="text-white opacity-90">Interactive visualization of global language distribution</p>
+            <p className="text-white opacity-70 text-xs mt-2">Based on WALS database | Click on points to see language details</p>
+            <div className="flex gap-3 mt-3">
+              <a href="https://wals.info/" target="_blank" rel="noopener noreferrer" className="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-all text-white">
+                WALS Database
+              </a>
+              <a href="https://lkozma.net/blog/languages-visualization.html" target="_blank" rel="noopener noreferrer" className="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-all text-white">
+                About This Visualization
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div className="pointer-events-auto">
+          <StatsDisplay languages={filteredLanguages} />
+        </div>
+      </div>
       
       <InfoPanel 
         language={selectedLanguage} 
         onClose={() => setSelectedLanguage(null)} 
       />
-      
-      <StatsDisplay languages={filteredLanguages} />
-      
-      <div className="absolute bottom-4 left-4 text-white bg-black/60 p-3 rounded backdrop-blur-md border border-white/10 shadow-xl z-10 max-w-md">
-        <h1 className="text-2xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200">
-          World Atlas of Language Structures
-        </h1>
-        <p className="opacity-90">Interactive visualization of global language distribution</p>
-        <p className="opacity-70 text-xs mt-2">Based on WALS database | Click on points to see language details</p>
-        <div className="flex gap-3 mt-3">
-          <a href="https://wals.info/" target="_blank" rel="noopener noreferrer" className="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-all">
-            WALS Database
-          </a>
-          <a href="https://lkozma.net/blog/languages-visualization.html" target="_blank" rel="noopener noreferrer" className="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-all">
-            About This Visualization
-          </a>
-        </div>
-      </div>
     </div>
   );
 };

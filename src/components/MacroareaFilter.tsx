@@ -11,7 +11,7 @@ export const MacroareaFilter = ({
   const areas = ["Africa", "Europe", "Asia", "North America", "South America", "Oceania"];
   
   return (
-    <div className="fixed left-0 bottom-0 p-4 bg-black/70 backdrop-blur-md rounded-tr-lg text-white">
+    <div className="bg-black/60 p-3 rounded backdrop-blur-md border border-white/10 shadow-xl text-white">
       <h3 className="text-lg font-semibold mb-2">Filter by Region</h3>
       <div className="flex flex-wrap gap-2">
         <button

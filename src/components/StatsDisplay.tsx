@@ -20,7 +20,7 @@ export const StatsDisplay = ({ languages }: StatsDisplayProps) => {
     .slice(0, 5);
     
   return (
-    <div className="fixed right-0 bottom-0 p-4 bg-black/70 backdrop-blur-md rounded-tl-lg text-white max-w-xs">
+    <div className="bg-black/60 p-3 rounded backdrop-blur-md border border-white/10 shadow-xl text-white">
       <h3 className="text-lg font-semibold mb-2">Language Stats</h3>
       <div className="text-sm">
         <p>Total languages: {languages.length}</p>

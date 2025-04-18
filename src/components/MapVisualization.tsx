@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { Language } from '@/lib/walsData';
 import { projectLatLongToXY } from '@/utils/mapProjection';
@@ -50,12 +51,20 @@ export const MapVisualization = ({
   useEffect(() => {
     if (zoomToCoordinates && !zoomApplied) {
       setZoomApplied(true);
+      setZoom(zoomToCoordinates.scale);
+      
+      // Calculate rotation based on longitude to center the view
+      const targetLongitude = zoomToCoordinates.centerLong;
+      setRotation(prev => ({
+        x: prev.x,
+        y: -targetLongitude
+      }));
     }
   }, [zoomToCoordinates, zoomApplied]);
 
   useEffect(() => {
     const animateGlobe = () => {
-      if (!isDragging) {
+      if (!isDragging && !zoomToCoordinates) {
         setRotation(prev => ({
           x: prev.x,
           y: prev.y + 0.1
@@ -71,7 +80,7 @@ export const MapVisualization = ({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isDragging]);
+  }, [isDragging, zoomToCoordinates]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).classList.contains('map-container')) {
@@ -148,7 +157,7 @@ export const MapVisualization = ({
   return (
     <div 
       ref={containerRef} 
-      className="relative map-container w-full h-full overflow-hidden cursor-grab bg-[#1A1F2C]"
+      className="relative map-container w-full h-full overflow-hidden cursor-grab bg-[#0F1319]" // Darker background
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -159,11 +168,11 @@ export const MapVisualization = ({
         <img 
           src="/world-map.svg" 
           alt="World Map" 
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-15" // Less opacity for better contrast
           style={{
             transform: `rotate3d(1, 0, 0, ${rotation.x}deg) rotate3d(0, 1, 0, ${rotation.y}deg)`,
             transition: isDragging ? 'none' : 'transform 0.1s ease-out',
-            filter: 'brightness(0.7) contrast(1.2)'
+            filter: 'brightness(0.6) contrast(1.4) saturate(0.8)' // Adjusted for better point visibility
           }}
         />
       </div>
@@ -176,9 +185,30 @@ export const MapVisualization = ({
             language={language}
             isSelected={selectedLanguage?.id === language.id}
             onClick={() => setSelectedLanguage(language)}
-            className="shadow-[0_0_10px_2px_rgba(255,255,255,0.3)]"
+            className="shadow-[0_0_15px_4px_rgba(255,255,255,0.25)]"
           />
         ))}
+      </div>
+      
+      {/* Zoom controls */}
+      <div className="absolute bottom-4 right-4 flex flex-col bg-black/50 backdrop-blur-md rounded overflow-hidden">
+        <button 
+          className="p-2 text-white hover:bg-white/20"
+          onClick={() => setZoom(prev => Math.min(prev + 0.5, 4))}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        <button 
+          className="p-2 text-white hover:bg-white/20 border-t border-white/20"
+          onClick={() => setZoom(prev => Math.max(prev - 0.5, 0.5))}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
       </div>
     </div>
   );

@@ -23,14 +23,14 @@ export const getFamilyColor = (family: string): string => {
     'Eskimo-Aleut': '#5D9CEC',      // Soft Blue
   };
 
-  // Generate a deterministic color for unknown families
+  // Generate a more vibrant, deterministic color for unknown families
   if (!colorMap[family]) {
     let hash = 0;
     for (let i = 0; i < family.length; i++) {
       hash = family.charCodeAt(i) + ((hash << 5) - hash);
     }
     const hue = Math.abs(hash) % 360;
-    return `hsl(${hue}, 70%, 60%)`;
+    return `hsl(${hue}, 80%, 65%)`; // More saturated and brighter colors
   }
 
   return colorMap[family];

@@ -7,6 +7,8 @@ import { MacroareaFilter } from '@/components/MacroareaFilter';
 import { InfoPanel } from '@/components/InfoPanel';
 import { StatsDisplay } from '@/components/StatsDisplay';
 import { SearchBar } from '@/components/SearchBar';
+import { MinusCircle, PlusCircle } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const Index = () => {
   const [languages, setLanguages] = useState<Language[]>([]);
@@ -15,6 +17,7 @@ const Index = () => {
   const [selectedFamily, setSelectedFamily] = useState<string | null>(null);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInfoOpen, setIsInfoOpen] = useState(true);
   
   const [zoomToCoordinates, setZoomToCoordinates] = useState<{
     centerLat: number;
@@ -57,13 +60,37 @@ const Index = () => {
       scale: 2.5
     });
   };
+
+  // Region zooming functionality
+  useEffect(() => {
+    if (selectedArea && !zoomToCoordinates) {
+      // Default coordinates for regions
+      const regionCoordinates: Record<string, { lat: number; long: number; scale: number }> = {
+        'Africa': { lat: 5, long: 20, scale: 2 },
+        'Europe': { lat: 50, long: 10, scale: 2.5 },
+        'Asia': { lat: 35, long: 90, scale: 1.8 },
+        'North America': { lat: 40, long: -100, scale: 2 },
+        'South America': { lat: -20, long: -60, scale: 2 },
+        'Oceania': { lat: -25, long: 135, scale: 2 }
+      };
+      
+      const region = regionCoordinates[selectedArea];
+      if (region) {
+        setZoomToCoordinates({
+          centerLat: region.lat,
+          centerLong: region.long,
+          scale: region.scale
+        });
+      }
+    }
+  }, [selectedArea]);
   
   // Reset zoom when family is cleared
   useEffect(() => {
-    if (!selectedFamily) {
+    if (!selectedFamily && !selectedArea) {
       setZoomToCoordinates(null);
     }
-  }, [selectedFamily]);
+  }, [selectedFamily, selectedArea]);
 
   // Filter languages based on selected family and area
   useEffect(() => {
@@ -133,44 +160,67 @@ const Index = () => {
         zoomToCoordinates={zoomToCoordinates}
       />
       
-      <SearchBar 
-        languages={languages}
-        onSelectLanguage={setSelectedLanguage}
-      />
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-md px-4">
+        <SearchBar 
+          languages={languages}
+          onSelectLanguage={setSelectedLanguage}
+        />
+      </div>
       
-      <FilterControls 
-        families={families}
-        selectedFamily={selectedFamily}
-        onSelectFamily={setSelectedFamily}
-        onZoomToFamily={handleZoomToFamily}
-      />
+      <div className="absolute top-20 right-4 z-10">
+        <FilterControls 
+          families={families}
+          selectedFamily={selectedFamily}
+          onSelectFamily={setSelectedFamily}
+          onZoomToFamily={handleZoomToFamily}
+        />
+      </div>
       
-      <div className="fixed left-0 bottom-0 w-full flex items-end justify-between p-4 pointer-events-none">
+      <div className="fixed left-4 bottom-4 z-10 pointer-events-none">
         <div className="pointer-events-auto">
           <MacroareaFilter
             selectedArea={selectedArea}
             setSelectedArea={setSelectedArea}
           />
         </div>
-        
-        <div className="pointer-events-auto max-w-md">
-          <div className="bg-black/60 p-3 rounded backdrop-blur-md border border-white/10 shadow-xl">
-            <h1 className="text-2xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200">
-              World Atlas of Language Structures
-            </h1>
-            <p className="text-white opacity-90">Interactive visualization of global language distribution</p>
-            <p className="text-white opacity-70 text-xs mt-2">Based on WALS database | Click on points to see language details</p>
-            <div className="flex gap-3 mt-3">
-              <a href="https://wals.info/" target="_blank" rel="noopener noreferrer" className="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-all text-white">
-                WALS Database
-              </a>
-              <a href="https://lkozma.net/blog/languages-visualization.html" target="_blank" rel="noopener noreferrer" className="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-all text-white">
-                About This Visualization
-              </a>
+      </div>
+      
+      <div className="fixed right-4 bottom-4 z-10 pointer-events-none">
+        <div className="pointer-events-auto">
+          <Collapsible defaultOpen={true} className="w-full">
+            <div className="bg-black/70 rounded backdrop-blur-md border border-white/10 shadow-xl">
+              <div className="p-3 flex items-center justify-between">
+                <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200">
+                  World Atlas of Language Structures
+                </h1>
+                <CollapsibleTrigger className="rounded-full hover:bg-white/10 p-1 transition-colors">
+                  {({ open }) => open ? 
+                    <MinusCircle className="h-5 w-5 text-white/80" /> : 
+                    <PlusCircle className="h-5 w-5 text-white/80" />
+                  }
+                </CollapsibleTrigger>
+              </div>
+              
+              <CollapsibleContent>
+                <div className="px-3 pb-3">
+                  <p className="text-white opacity-90">Interactive visualization of global language distribution</p>
+                  <p className="text-white opacity-70 text-xs mt-2">Based on WALS database | Click on points to see language details</p>
+                  <div className="flex gap-3 mt-3">
+                    <a href="https://wals.info/" target="_blank" rel="noopener noreferrer" className="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-all text-white">
+                      WALS Database
+                    </a>
+                    <a href="https://lkozma.net/blog/languages-visualization.html" target="_blank" rel="noopener noreferrer" className="text-xs bg-white/20 px-2 py-1 rounded hover:bg-white/30 transition-all text-white">
+                      About This Visualization
+                    </a>
+                  </div>
+                </div>
+              </CollapsibleContent>
             </div>
-          </div>
+          </Collapsible>
         </div>
-        
+      </div>
+      
+      <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2 z-10 pointer-events-none">
         <div className="pointer-events-auto">
           <StatsDisplay languages={filteredLanguages} />
         </div>

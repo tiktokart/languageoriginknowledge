@@ -1,7 +1,6 @@
-
 import { Language } from '@/lib/walsData';
 import { getFamilyColor } from '@/utils/languageColors';
-import { X, BookOpen } from 'lucide-react';
+import { X, BookOpen, History } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 interface InfoPanelProps {
@@ -26,41 +25,49 @@ export const InfoPanel = ({ language, onClose }: InfoPanelProps) => {
 
   // Function to get historical information based on language family
   const getHistoricalInfo = (language: Language) => {
-    const familyHistoryMap: Record<string, { period: string, evolution: string }> = {
+    const familyHistoryMap: Record<string, { period: string, evolution: string, derivedLanguages: string[] }> = {
       'Indo-European': {
         period: 'First attested c. 3500 BCE through Sanskrit, Ancient Greek, and Latin documents',
-        evolution: 'Evolved from Proto-Indo-European, with major branches forming around 3000-2000 BCE'
+        evolution: 'Evolved from Proto-Indo-European, with major branches forming around 3000-2000 BCE',
+        derivedLanguages: ['Sanskrit → Hindi, Bengali, Marathi', 'Latin → Italian, French, Spanish, Portuguese', 'Proto-Germanic → English, German, Dutch', 'Proto-Slavic → Russian, Polish, Czech']
       },
       'Austronesian': {
         period: 'Archaeological evidence from c. 5000-4000 BCE, written records from 800 CE',
-        evolution: 'Spread from Taiwan throughout Southeast Asia and the Pacific islands over millennia'
+        evolution: 'Spread from Taiwan throughout Southeast Asia and the Pacific islands over millennia',
+        derivedLanguages: ['Proto-Malayo-Polynesian → Malay, Indonesian, Tagalog', 'Proto-Oceanic → Hawaiian, Māori, Samoan']
       },
       'Sino-Tibetan': {
         period: 'Oracle bone inscriptions from c. 1250 BCE represent earliest Chinese writing',
-        evolution: 'Diverged from common ancestor around 6000-4000 BCE in East Asia'
+        evolution: 'Diverged from common ancestor around 6000-4000 BCE in East Asia',
+        derivedLanguages: ['Old Chinese → Middle Chinese → Mandarin, Cantonese, Wu', 'Proto-Tibeto-Burman → Tibetan, Burmese, Karen']
       },
       'Afro-Asiatic': {
         period: 'Egyptian hieroglyphs from c. 3200 BCE and Akkadian cuneiform from c. 2500 BCE',
-        evolution: 'Originated in either Northeast Africa or the Near East around 10,000 BCE'
+        evolution: 'Originated in either Northeast Africa or the Near East around 10,000 BCE',
+        derivedLanguages: ['Ancient Egyptian → Coptic', 'Proto-Semitic → Arabic, Hebrew, Amharic', 'Proto-Berber → Tamazight, Tuareg']
       },
       'Niger-Congo': {
         period: 'Largely oral traditions until European contact, written records from 16th century CE',
-        evolution: 'Diversified beginning around 6000-4000 BCE across sub-Saharan Africa'
+        evolution: 'Diversified beginning around 6000-4000 BCE across sub-Saharan Africa',
+        derivedLanguages: ['Proto-Bantu → Swahili, Zulu, Xhosa', 'Proto-Mande → Bambara, Mandinka', 'Proto-Volta-Congo → Yoruba, Igbo']
       },
       'Austroasiatic': {
         period: 'First inscriptions in Old Khmer date to 611 CE',
-        evolution: 'Originated in East/Southeast Asia, split from Hmong-Mien around 4000 BCE'
+        evolution: 'Originated in East/Southeast Asia, split from Hmong-Mien around 4000 BCE',
+        derivedLanguages: ['Old Mon → Mon', 'Old Khmer → Khmer', 'Proto-Vietic → Vietnamese', 'Proto-Munda → Santali, Mundari']
       },
       'Dravidian': {
         period: 'Tamil Brahmi inscriptions from c. 300 BCE, possible Indus Valley connection',
-        evolution: 'Proto-Dravidian estimated to have been spoken around 4500-4000 BCE'
+        evolution: 'Proto-Dravidian estimated to have been spoken around 4500-4000 BCE',
+        derivedLanguages: ['Old Tamil → Tamil, Malayalam', 'Proto-South-Central → Telugu, Gondi', 'Proto-Central → Kolami, Naiki']
       }
     };
 
     // Default historical information for families not in our map
     const defaultHistory = {
       period: 'Historical documentation varies; systematic linguistic study began in the 19th century',
-      evolution: 'Part of the approximately 7,000 languages documented in modern linguistics'
+      evolution: 'Part of the approximately 7,000 languages documented in modern linguistics',
+      derivedLanguages: ['Various modern dialects and varieties']
     };
 
     return familyHistoryMap[language.family] || defaultHistory;
@@ -92,26 +99,11 @@ export const InfoPanel = ({ language, onClose }: InfoPanelProps) => {
       <div className="mt-4 bg-white/10 rounded p-3 mb-4">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold">Historical Information</h3>
-          <Popover>
-            <PopoverTrigger>
-              <button className="hover:bg-white/20 p-1 rounded-full transition-colors">
-                <BookOpen size={16} />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="bg-black/90 text-white border-gray-700 w-80">
-              <div className="text-xs">
-                <p className="font-semibold mb-1">Academic Sources:</p>
-                <ul className="list-disc pl-4 space-y-1">
-                  <li>Columbia University's Center for Comparative Literature and Society</li>
-                  <li>Harvard University's Indo-European Studies Program</li>
-                  <li>University of Oxford's Comparative Philology Database</li>
-                  <li>Max Planck Institute for Evolutionary Anthropology</li>
-                  <li>SOAS University of London Language Documentation</li>
-                </ul>
-                <p className="mt-2 italic">Note: This historical information represents general linguistic consensus and may vary by specific scholarly tradition.</p>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <PopoverTrigger asChild>
+            <div className="hover:bg-white/20 p-1 rounded-full transition-colors cursor-pointer">
+              <BookOpen size={16} />
+            </div>
+          </PopoverTrigger>
         </div>
         <div className="space-y-2 text-sm">
           <div>
@@ -121,6 +113,14 @@ export const InfoPanel = ({ language, onClose }: InfoPanelProps) => {
           <div>
             <span className="font-medium">Historical Evolution:</span>
             <p className="opacity-90">{historicalInfo.evolution}</p>
+          </div>
+          <div>
+            <span className="font-medium">Major Derived Languages:</span>
+            <ul className="list-disc pl-4 mt-1 opacity-90">
+              {historicalInfo.derivedLanguages.map((derivation, index) => (
+                <li key={index}>{derivation}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

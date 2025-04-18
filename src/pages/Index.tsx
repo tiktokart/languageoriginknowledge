@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { fetchWalsLanguages, Language } from '@/lib/walsData';
 
 // Color mapping for language families
@@ -32,7 +31,7 @@ const projectLatLongToXY = (latitude: number, longitude: number, width: number, 
   return [x, y];
 };
 
-// Language point component
+// Language point component with enhanced click interaction
 const LanguagePoint = ({ 
   x, 
   y, 
@@ -51,7 +50,7 @@ const LanguagePoint = ({
   
   return (
     <div 
-      className={`absolute rounded-full cursor-pointer language-point ${isSelected ? 'selected' : ''}`}
+      className={`absolute rounded-full cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-150 language-point ${isSelected ? 'selected z-50' : ''}`}
       style={{
         left: `${x}px`,
         top: `${y}px`,
@@ -62,8 +61,172 @@ const LanguagePoint = ({
         transform: 'translate(-50%, -50%)'
       }}
       onClick={onClick}
-      title={language.name}
+      title={`${language.name} (${language.family})`}
     />
+  );
+};
+
+// Filter controls component with zoom functionality
+const FilterControls = ({ 
+  families, 
+  selectedFamily, 
+  onSelectFamily,
+  onZoomToFamily 
+}: { 
+  families: string[]; 
+  selectedFamily: string | null; 
+  onSelectFamily: (family: string | null) => void;
+  onZoomToFamily: (family: string) => void;
+}) => {
+  return (
+    <div className="fixed left-0 top-0 p-4 bg-black/70 backdrop-blur-md rounded-br-lg text-white">
+      <h3 className="text-lg font-semibold mb-2">Filter by Family</h3>
+      <div className="flex flex-wrap gap-2">
+        <button 
+          onClick={() => onSelectFamily(null)}
+          className={`px-2 py-1 rounded text-sm ${selectedFamily === null ? 'bg-white text-black' : 'bg-white/20'}`}
+        >
+          All
+        </button>
+        {families.map(family => (
+          <button 
+            key={family}
+            onClick={() => {
+              onSelectFamily(family);
+              onZoomToFamily(family);
+            }}
+            className={`px-2 py-1 rounded text-sm ${selectedFamily === family ? 'bg-white text-black' : 'bg-white/20'}`}
+            style={{ borderColor: getFamilyColor(family) }}
+          >
+            {family}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Map visualization with zooming capabilities
+const MapVisualization = ({
+  languages,
+  selectedLanguage,
+  setSelectedLanguage,
+  zoomToCoordinates
+}: {
+  languages: Language[];
+  selectedLanguage: Language | null;
+  setSelectedLanguage: (language: Language | null) => void;
+  zoomToCoordinates: { centerLat: number; centerLong: number; scale: number } | null;
+}) => {
+  const [dimensions, setDimensions] = useState({ width: 800, height: 400 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.offsetWidth,
+          height: containerRef.current.offsetHeight
+        });
+      }
+    };
+    
+    window.addEventListener('resize', updateDimensions);
+    updateDimensions();
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  // Apply zoom transform to points
+  const getTransformedCoordinates = (lat: number, long: number) => {
+    if (!zoomToCoordinates) {
+      return projectLatLongToXY(lat, long, dimensions.width, dimensions.height);
+    }
+
+    const scale = zoomToCoordinates.scale;
+    const centerX = dimensions.width / 2;
+    const centerY = dimensions.height / 2;
+    
+    const [baseX, baseY] = projectLatLongToXY(lat, long, dimensions.width, dimensions.height);
+    const [zoomCenterX, zoomCenterY] = projectLatLongToXY(
+      zoomToCoordinates.centerLat,
+      zoomToCoordinates.centerLong,
+      dimensions.width,
+      dimensions.height
+    );
+    
+    const dx = baseX - zoomCenterX;
+    const dy = baseY - zoomCenterY;
+    
+    return [
+      centerX + dx * scale,
+      centerY + dy * scale
+    ];
+  };
+  
+  // Project all languages to x,y coordinates with zoom
+  const points = languages.map(language => {
+    const [x, y] = getTransformedCoordinates(language.latitude, language.longitude);
+    return { x, y, language };
+  });
+  
+  return (
+    <div ref={containerRef} className="relative map-container w-full h-full overflow-hidden">
+      <div className="absolute inset-0 w-full h-full flex items-center justify-center z-0">
+        <img 
+          src="/world-map.svg" 
+          alt="World Map" 
+          className="w-full h-full object-cover opacity-30"
+        />
+      </div>
+      {points.map(({ x, y, language }) => (
+        <LanguagePoint 
+          key={language.id}
+          x={x}
+          y={y}
+          language={language}
+          isSelected={selectedLanguage?.id === language.id}
+          onClick={() => setSelectedLanguage(language)}
+        />
+      ))}
+    </div>
+  );
+};
+
+// Macroarea filter component
+const MacroareaFilter = ({
+  selectedArea,
+  setSelectedArea
+}: {
+  selectedArea: string | null;
+  setSelectedArea: (area: string | null) => void;
+}) => {
+  const areas = ["Africa", "Europe", "Asia", "North America", "South America", "Oceania"];
+  
+  return (
+    <div className="fixed left-0 bottom-0 p-4 bg-black/70 backdrop-blur-md rounded-tr-lg text-white">
+      <h3 className="text-lg font-semibold mb-2">Filter by Region</h3>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setSelectedArea(null)}
+          className={`px-2 py-1 rounded text-sm family-filter ${
+            selectedArea === null ? 'bg-white text-black' : 'bg-white/10'
+          }`}
+        >
+          All Regions
+        </button>
+        {areas.map(area => (
+          <button
+            key={area}
+            onClick={() => setSelectedArea(area)}
+            className={`px-2 py-1 rounded text-sm family-filter ${
+              selectedArea === area ? 'bg-white text-black' : 'bg-white/10'
+            }`}
+          >
+            {area}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -137,144 +300,6 @@ const InfoPanel = ({ language }: { language: Language | null }) => {
   );
 };
 
-// Filter controls component
-const FilterControls = ({ 
-  families, 
-  selectedFamily, 
-  onSelectFamily 
-}: { 
-  families: string[]; 
-  selectedFamily: string | null; 
-  onSelectFamily: (family: string | null) => void;
-}) => {
-  return (
-    <div className="fixed left-0 top-0 p-4 bg-black/70 backdrop-blur-md rounded-br-lg text-white">
-      <h3 className="text-lg font-semibold mb-2">Filter by Family</h3>
-      <div className="flex flex-wrap gap-2">
-        <button 
-          onClick={() => onSelectFamily(null)}
-          className={`px-2 py-1 rounded text-sm ${selectedFamily === null ? 'bg-white text-black' : 'bg-white/20'}`}
-        >
-          All
-        </button>
-        {families.map(family => (
-          <button 
-            key={family}
-            onClick={() => onSelectFamily(family)}
-            className={`px-2 py-1 rounded text-sm ${selectedFamily === family ? 'bg-white text-black' : 'bg-white/20'}`}
-            style={{ borderColor: getFamilyColor(family) }}
-          >
-            {family}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Two-dimensional visualization
-const MapVisualization = ({
-  languages,
-  selectedLanguage,
-  setSelectedLanguage
-}: {
-  languages: Language[];
-  selectedLanguage: Language | null;
-  setSelectedLanguage: (language: Language | null) => void;
-}) => {
-  const [dimensions, setDimensions] = useState({ width: 800, height: 400 });
-  
-  // Update dimensions based on window size
-  useEffect(() => {
-    const updateDimensions = () => {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    };
-    
-    window.addEventListener('resize', updateDimensions);
-    updateDimensions();
-    
-    return () => window.removeEventListener('resize', updateDimensions);
-  }, []);
-  
-  // Project all languages to x,y coordinates
-  const points = languages.map(language => {
-    const [x, y] = projectLatLongToXY(
-      language.latitude, 
-      language.longitude, 
-      dimensions.width, 
-      dimensions.height
-    );
-    
-    return { x, y, language };
-  });
-  
-  return (
-    <div className="relative map-container w-full h-full overflow-hidden">
-      <div className="absolute inset-0 w-full h-full flex items-center justify-center z-0">
-        <img 
-          src="/world-map.svg" 
-          alt="World Map" 
-          className="w-full h-full object-cover opacity-30"
-        />
-      </div>
-      {/* World map outlines */}
-      
-      {/* Language points */}
-      {points.map(({ x, y, language }) => (
-        <LanguagePoint 
-          key={language.id}
-          x={x}
-          y={y}
-          language={language}
-          isSelected={selectedLanguage?.id === language.id}
-          onClick={() => setSelectedLanguage(language)}
-        />
-      ))}
-    </div>
-  );
-};
-
-// Macroarea filter component
-const MacroareaFilter = ({
-  selectedArea,
-  setSelectedArea
-}: {
-  selectedArea: string | null;
-  setSelectedArea: (area: string | null) => void;
-}) => {
-  const areas = ["Africa", "Europe", "Asia", "North America", "South America", "Oceania"];
-  
-  return (
-    <div className="fixed left-0 bottom-0 p-4 bg-black/70 backdrop-blur-md rounded-tr-lg text-white">
-      <h3 className="text-lg font-semibold mb-2">Filter by Region</h3>
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setSelectedArea(null)}
-          className={`px-2 py-1 rounded text-sm family-filter ${
-            selectedArea === null ? 'bg-white text-black' : 'bg-white/10'
-          }`}
-        >
-          All Regions
-        </button>
-        {areas.map(area => (
-          <button
-            key={area}
-            onClick={() => setSelectedArea(area)}
-            className={`px-2 py-1 rounded text-sm family-filter ${
-              selectedArea === area ? 'bg-white text-black' : 'bg-white/10'
-            }`}
-          >
-            {area}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 // Stats display component
 const StatsDisplay = ({ languages }: { languages: Language[] }) => {
   // Count languages by family
@@ -315,7 +340,7 @@ const StatsDisplay = ({ languages }: { languages: Language[] }) => {
   );
 };
 
-// Main visualization component
+// Main Index component with zoom state
 const Index = () => {
   const [languages, setLanguages] = useState<Language[]>([]);
   const [filteredLanguages, setFilteredLanguages] = useState<Language[]>([]);
@@ -323,6 +348,12 @@ const Index = () => {
   const [selectedFamily, setSelectedFamily] = useState<string | null>(null);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const [zoomToCoordinates, setZoomToCoordinates] = useState<{
+    centerLat: number;
+    centerLong: number;
+    scale: number;
+  } | null>(null);
   
   // Get unique language families
   const families = [...new Set(languages.map(lang => lang.family))];
@@ -345,6 +376,28 @@ const Index = () => {
     loadLanguages();
   }, []);
   
+  // Calculate center coordinates for a language family
+  const handleZoomToFamily = (family: string) => {
+    const familyLanguages = languages.filter(lang => lang.family === family);
+    if (familyLanguages.length === 0) return;
+    
+    const avgLat = familyLanguages.reduce((sum, lang) => sum + lang.latitude, 0) / familyLanguages.length;
+    const avgLong = familyLanguages.reduce((sum, lang) => sum + lang.longitude, 0) / familyLanguages.length;
+    
+    setZoomToCoordinates({
+      centerLat: avgLat,
+      centerLong: avgLong,
+      scale: 2.5 // Adjust this value to control zoom level
+    });
+  };
+  
+  // Reset zoom when "All" is selected
+  useEffect(() => {
+    if (!selectedFamily) {
+      setZoomToCoordinates(null);
+    }
+  }, [selectedFamily]);
+
   // Filter languages by family and region
   useEffect(() => {
     let filtered = languages;
@@ -412,13 +465,15 @@ const Index = () => {
       <MapVisualization 
         languages={filteredLanguages} 
         selectedLanguage={selectedLanguage} 
-        setSelectedLanguage={setSelectedLanguage} 
+        setSelectedLanguage={setSelectedLanguage}
+        zoomToCoordinates={zoomToCoordinates}
       />
       
       <FilterControls 
         families={families}
         selectedFamily={selectedFamily}
         onSelectFamily={setSelectedFamily}
+        onZoomToFamily={handleZoomToFamily}
       />
       
       <MacroareaFilter

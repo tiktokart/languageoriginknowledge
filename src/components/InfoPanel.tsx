@@ -1,4 +1,3 @@
-
 import { Language } from '@/lib/walsData';
 import { getFamilyColor } from '@/utils/languageColors';
 import { X, BookOpen, History } from 'lucide-react';
@@ -65,14 +64,16 @@ export const InfoPanel = ({ language, onClose }: InfoPanelProps) => {
       }
     };
 
-    // Default historical information for families not in our map
-    const defaultHistory = {
-      period: 'Historical documentation varies; systematic linguistic study began in the 19th century',
-      evolution: 'Part of the approximately 7,000 languages documented in modern linguistics',
-      derivedLanguages: ['Various modern dialects and varieties']
-    };
+    // If the language family is not found in the map, return a "no data" object
+    if (!familyHistoryMap[language.family]) {
+      return {
+        period: 'No data in datasets',
+        evolution: 'No data in datasets',
+        derivedLanguages: ['No data in datasets']
+      };
+    }
 
-    return familyHistoryMap[language.family] || defaultHistory;
+    return familyHistoryMap[language.family];
   };
 
   const historicalInfo = getHistoricalInfo(language);
@@ -170,3 +171,5 @@ export const InfoPanel = ({ language, onClose }: InfoPanelProps) => {
     </div>
   );
 };
+
+export default InfoPanel;

@@ -25,6 +25,7 @@ export const MapVisualization = ({
   const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
   const animationRef = useRef<number | null>(null);
   
+  // Update dimensions on mount and resize
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -104,50 +105,50 @@ export const MapVisualization = ({
   };
 
   const getTransformedCoordinates = (lat: number, long: number) => {
-    if (!zoomToCoordinates) {
-      // Apply rotation to standard projection
-      const [baseX, baseY] = projectLatLongToXY(lat, long, dimensions.width, dimensions.height);
-      const centerX = dimensions.width / 2;
-      const centerY = dimensions.height / 2;
-      
-      // Convert to polar coordinates
-      const dx = baseX - centerX;
-      const dy = baseY - centerY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
-      // Original angle
-      let angle = Math.atan2(dy, dx);
-      
-      // Apply rotation (convert rotation from degrees to radians)
-      angle += (rotation.y * Math.PI) / 180;
-      
-      // Calculate new position
-      const newX = centerX + distance * Math.cos(angle);
-      const newY = centerY + distance * Math.sin(angle);
-      
-      return [newX, newY];
-    }
-
-    // If zoom coordinates are provided, transform the points
-    const scale = zoomToCoordinates.scale;
+    // Get base coordinates from the projection
+    const [baseX, baseY] = projectLatLongToXY(lat, long, dimensions.width, dimensions.height);
     const centerX = dimensions.width / 2;
     const centerY = dimensions.height / 2;
     
-    const [baseX, baseY] = projectLatLongToXY(lat, long, dimensions.width, dimensions.height);
-    const [zoomCenterX, zoomCenterY] = projectLatLongToXY(
-      zoomToCoordinates.centerLat,
-      zoomToCoordinates.centerLong,
-      dimensions.width,
-      dimensions.height
-    );
+    // Apply rotation first (for both zoomed and non-zoomed view)
+    // Convert to polar coordinates
+    const dx = baseX - centerX;
+    const dy = baseY - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
     
-    const dx = baseX - zoomCenterX;
-    const dy = baseY - zoomCenterY;
+    // Original angle
+    let angle = Math.atan2(dy, dx);
     
-    return [
-      centerX + dx * scale,
-      centerY + dy * scale
-    ];
+    // Apply rotation (convert rotation from degrees to radians)
+    angle += (rotation.y * Math.PI) / 180;
+    
+    // Calculate rotated position
+    const rotatedX = centerX + distance * Math.cos(angle);
+    const rotatedY = centerY + distance * Math.sin(angle);
+    
+    // Now apply zoom if zoom coordinates are provided
+    if (zoomToCoordinates) {
+      // Get the center position for zooming
+      const [zoomCenterX, zoomCenterY] = projectLatLongToXY(
+        zoomToCoordinates.centerLat,
+        zoomToCoordinates.centerLong,
+        dimensions.width,
+        dimensions.height
+      );
+      
+      // Calculate the difference between the rotated point and zoom center
+      const dxZoom = rotatedX - zoomCenterX;
+      const dyZoom = rotatedY - zoomCenterY;
+      
+      // Apply the zoom scale and center in the view
+      return [
+        centerX + dxZoom * zoomToCoordinates.scale,
+        centerY + dyZoom * zoomToCoordinates.scale
+      ];
+    }
+    
+    // If no zoom, just return the rotated coordinates
+    return [rotatedX, rotatedY];
   };
   
   const points = languages.map(language => {

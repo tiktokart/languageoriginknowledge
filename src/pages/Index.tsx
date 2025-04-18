@@ -45,9 +45,11 @@ const Index = () => {
     const familyLanguages = languages.filter(lang => lang.family === family);
     if (familyLanguages.length === 0) return;
     
+    // Calculate the average coordinates for the language family
     const avgLat = familyLanguages.reduce((sum, lang) => sum + lang.latitude, 0) / familyLanguages.length;
     const avgLong = familyLanguages.reduce((sum, lang) => sum + lang.longitude, 0) / familyLanguages.length;
     
+    // Set zoom coordinates with a higher scale for better visibility
     setZoomToCoordinates({
       centerLat: avgLat,
       centerLong: avgLong,
@@ -55,12 +57,14 @@ const Index = () => {
     });
   };
   
+  // Reset zoom when family is cleared
   useEffect(() => {
     if (!selectedFamily) {
       setZoomToCoordinates(null);
     }
   }, [selectedFamily]);
 
+  // Filter languages based on selected family and area
   useEffect(() => {
     let filtered = languages;
     
@@ -101,6 +105,7 @@ const Index = () => {
     setFilteredLanguages(filtered);
   }, [selectedFamily, selectedArea, languages]);
   
+  // Loading screen
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-slate-900 text-white">

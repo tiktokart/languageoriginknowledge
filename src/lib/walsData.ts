@@ -1,3 +1,4 @@
+
 // WALS (World Atlas of Language Structures) data service
 // This handles loading and processing language data
 
@@ -145,6 +146,36 @@ export const generateWalsLanguageData = (count: number = 300): Language[] => {
     { name: 'Lao', family: 'Tai-Kadai', lat: 18.0, lng: 103.0, iso: 'lao' }
   ];
 
+  // Additional realistic language names by region to use instead of "Language {id}"
+  const additionalLanguages = {
+    "Africa": [
+      "Wolof", "Maasai", "Kikuyu", "Berber", "Lingala", "Twi", "Ndebele", "Tswana", 
+      "Tigrinya", "Kinyarwanda", "Shona", "Bambara", "Kanuri", "Sesotho", "Luganda"
+    ],
+    "Europe": [
+      "Breton", "Occitan", "Frisian", "Luxembourgish", "Corsican", "Romani", "Sami", 
+      "Sardinian", "Galician", "Faroese", "Maltese", "Gagauz", "Aromanian"
+    ],
+    "Asia": [
+      "Uyghur", "Sindhi", "Pashto", "Balochi", "Hakka", "Assamese", "Rajasthani", 
+      "Marathi", "Konkani", "Kashmiri", "Meitei", "Tulu", "Dzongkha", "Nepali",
+      "Sinhala", "Lhasa", "Bhojpuri", "Maithili", "Wu", "Cantonese"
+    ],
+    "North America": [
+      "Cree", "Ojibwe", "Sioux", "Cherokee", "Comanche", "Mohawk", "Nez Perce", 
+      "Yupik", "Tlingit", "Haida", "Hopi", "Apache", "Choctaw", "Chickasaw"
+    ],
+    "South America": [
+      "Aymara", "Mapudungun", "Kichwa", "Wayuu", "Nahuatl", "Toba", "Mapuche", 
+      "Tupi", "Taíno", "Huichol", "Mixtec", "Tzotzil", "Zapotec", "Yanomami"
+    ],
+    "Oceania": [
+      "Tok Pisin", "Hiri Motu", "Tetum", "Tahitian", "Chamorro", "Marshallese", 
+      "Palauan", "Gilbertese", "Bislama", "Nauruan", "Chuukese", "Kosraean", 
+      "Rapanui", "Niuean", "Tuvaluan"
+    ]
+  };
+
   // Generate realistic WALS-like features based on actual WALS parameters
   const generateFeatures = (): Record<string, any> => {
     const features: Record<string, any> = {};
@@ -241,7 +272,8 @@ export const generateWalsLanguageData = (count: number = 300): Language[] => {
     latitude: lang.lat,
     longitude: lang.lng,
     isoCode: lang.iso,
-    features: generateFeatures()
+    features: generateFeatures(),
+    speakers: Math.floor(Math.random() * 900000000) + 100000 // Random speaker count between 100k and 900M
   }));
   
   // Generate additional languages if needed
@@ -299,14 +331,30 @@ export const generateWalsLanguageData = (count: number = 300): Language[] => {
           family = languageFamilies[Math.floor(Math.random() * languageFamilies.length)];
       }
       
+      // Select a language name from the appropriate region
+      const regionKey = region.name === "Europe" || region.name === "Asia" ? 
+        region.name : 
+        region.name === "Oceania" ? "Oceania" : 
+        region.name.includes("America") ? region.name : "Africa";
+      
+      const availableNames = additionalLanguages[regionKey as keyof typeof additionalLanguages];
+      const nameIndex = i % availableNames.length;
+      const languageName = availableNames[nameIndex];
+      
+      // Add a variant number if we have to reuse names
+      const finalName = i >= availableNames.length ? 
+        `${languageName} (Variant ${Math.floor(i / availableNames.length) + 1})` : 
+        languageName;
+      
       languages.push({
         id: `lang-${langId}`,
-        name: `Language ${langId}`,
+        name: finalName,
         family,
         latitude,
         longitude,
         macroarea: region.name,
-        features: generateFeatures()
+        features: generateFeatures(),
+        speakers: Math.floor(Math.random() * 10000000) + 10000 // Random speaker count between 10k and 10M for lesser-known languages
       });
     }
   }

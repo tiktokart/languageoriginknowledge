@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { Language } from '@/lib/walsData';
 import { projectLatLongToXY } from '@/utils/mapProjection';
@@ -79,8 +80,11 @@ export const MapVisualization = ({
 
   // Mouse interaction handlers
   const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setLastMousePosition({ x: e.clientX, y: e.clientY });
+    // Only set dragging if the target is the container itself, not a language point
+    if ((e.target as HTMLElement).classList.contains('map-container')) {
+      setIsDragging(true);
+      setLastMousePosition({ x: e.clientX, y: e.clientY });
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -173,16 +177,18 @@ export const MapVisualization = ({
           }}
         />
       </div>
-      {points.map(({ x, y, language }) => (
-        <LanguagePoint 
-          key={language.id}
-          x={x}
-          y={y}
-          language={language}
-          isSelected={selectedLanguage?.id === language.id}
-          onClick={() => setSelectedLanguage(language)}
-        />
-      ))}
+      <div className="absolute inset-0" style={{ pointerEvents: 'none' }}>
+        {points.map(({ x, y, language }) => (
+          <LanguagePoint 
+            key={language.id}
+            x={x}
+            y={y}
+            language={language}
+            isSelected={selectedLanguage?.id === language.id}
+            onClick={() => setSelectedLanguage(language)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

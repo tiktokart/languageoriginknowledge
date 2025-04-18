@@ -15,7 +15,8 @@ export const LanguagePoint = ({ x, y, language, isSelected, onClick }: LanguageP
   
   // Calculate base size based on language frequency
   const getBaseSize = () => {
-    const speakers = language.speakers || 1;
+    // Check if speakers property exists and is a number
+    const speakers = typeof language.speakers === 'number' ? language.speakers : 1;
     // Log scale for better visualization
     const baseSize = Math.log10(speakers) * 2;
     return Math.max(3, Math.min(12, baseSize)); // Clamp between 3 and 12 pixels
@@ -35,13 +36,14 @@ export const LanguagePoint = ({ x, y, language, isSelected, onClick }: LanguageP
         backgroundColor: color,
         boxShadow: isSelected ? `0 0 10px 2px ${color}` : 'none',
         transform: 'translate(-50%, -50%)',
-        zIndex: isSelected ? 50 : 10
+        zIndex: isSelected ? 50 : 10,
+        pointerEvents: 'auto' // Ensure clicks are captured
       }}
       onClick={(e) => {
         e.stopPropagation();
         onClick();
       }}
-      title={`${language.name} (${language.family}) - ${language.speakers || 'Unknown'} speakers`}
+      title={`${language.name} (${language.family}) - ${typeof language.speakers === 'number' ? language.speakers : 'Unknown'} speakers`}
     />
   );
 };

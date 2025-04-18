@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Search, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Search, ChevronLeft } from 'lucide-react';
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command';
 import { Language } from '@/lib/walsData';
 import { getFamilyColor } from '@/utils/languageColors';
@@ -27,6 +27,7 @@ export const SearchBar = ({ languages, onSelectLanguage }: SearchBarProps) => {
         <button 
           onClick={toggleExpand}
           className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+          aria-label="Open search"
         >
           <Search className="w-5 h-5 text-gray-600" />
         </button>
@@ -37,10 +38,12 @@ export const SearchBar = ({ languages, onSelectLanguage }: SearchBarProps) => {
             <CommandInput 
               placeholder="Search languages..."
               className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+              autoFocus
             />
             <button
               onClick={toggleExpand}
               className="ml-2 p-1 hover:bg-gray-100 rounded-full"
+              aria-label="Close search"
             >
               <ChevronLeft className="h-4 w-4 text-gray-400" />
             </button>

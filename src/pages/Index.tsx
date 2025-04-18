@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { fetchWalsLanguages, Language } from '@/lib/walsData';
 import { FilterControls } from '@/components/FilterControls';
@@ -167,7 +168,7 @@ const Index = () => {
         zoomToCoordinates={zoomToCoordinates}
       />
       
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-md px-4">
+      <div className="absolute top-4 left-20 z-50">
         <SearchBar 
           languages={languages}
           onSelectLanguage={setSelectedLanguage}

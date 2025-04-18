@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { fetchWalsLanguages, Language } from '@/lib/walsData';
 import { FilterControls } from '@/components/FilterControls';
@@ -182,26 +183,32 @@ const Index = () => {
         />
       </div>
       
-      <div className="fixed left-4 bottom-4 z-10 pointer-events-none">
+      {/* Bottom bar with fixed width containers and proper spacing */}
+      <div className="fixed left-0 right-0 bottom-4 z-10 flex justify-between items-end px-4">
         <div className="pointer-events-auto">
           <MacroareaFilter
             selectedArea={selectedArea}
             setSelectedArea={setSelectedArea}
           />
         </div>
-      </div>
-      
-      <div className="fixed right-4 bottom-4 z-10 pointer-events-none">
+        
+        <div className="pointer-events-auto">
+          <StatsDisplay languages={filteredLanguages} />
+        </div>
+        
         <div className="pointer-events-auto">
           <Collapsible defaultOpen={true} className="w-full">
-            <div className="bg-black/70 rounded backdrop-blur-md border border-white/10 shadow-xl">
+            <div className="bg-black/70 rounded-lg backdrop-blur-md border border-white/10 shadow-xl w-64">
               <div className="p-3 flex items-center justify-between">
                 <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200">
                   World Atlas of Language Structures
                 </h1>
                 <CollapsibleTrigger className="rounded-full hover:bg-white/10 p-1 transition-colors">
-                  <MinusCircle className="h-5 w-5 text-white/80 collapsible-minus-icon" />
-                  <PlusCircle className="h-5 w-5 text-white/80 collapsible-plus-icon hidden" />
+                  {open => (
+                    open ? 
+                    <MinusCircle className="h-5 w-5 text-white/80" /> : 
+                    <PlusCircle className="h-5 w-5 text-white/80" />
+                  )}
                 </CollapsibleTrigger>
               </div>
               
@@ -221,12 +228,6 @@ const Index = () => {
               </CollapsibleContent>
             </div>
           </Collapsible>
-        </div>
-      </div>
-      
-      <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2 z-10 pointer-events-none">
-        <div className="pointer-events-auto">
-          <StatsDisplay languages={filteredLanguages} />
         </div>
       </div>
       

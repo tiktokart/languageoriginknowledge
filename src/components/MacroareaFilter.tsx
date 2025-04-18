@@ -16,7 +16,7 @@ export const MacroareaFilter = ({
   const areas = ["Africa", "Europe", "Asia", "North America", "South America", "Oceania"];
   
   return (
-    <div className="bg-black/70 rounded backdrop-blur-md border border-white/10 shadow-xl text-white">
+    <div className="bg-black/70 rounded-lg backdrop-blur-md border border-white/10 shadow-xl text-white w-fit">
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
         <div className="p-3 flex items-center justify-between">
           <h3 className="text-lg font-semibold">Filter by Region</h3>

@@ -15,7 +15,7 @@ export const FilterControls = ({
   onZoomToFamily 
 }: FilterControlsProps) => {
   return (
-    <div className="fixed left-0 top-0 p-4 bg-black/70 backdrop-blur-md rounded-br-lg text-white">
+    <div className="fixed left-0 top-0 p-4 bg-black/70 backdrop-blur-md rounded-br-lg text-white z-10">
       <h3 className="text-lg font-semibold mb-2">Filter by Family</h3>
       <div className="flex flex-wrap gap-2">
         <button 
@@ -32,7 +32,11 @@ export const FilterControls = ({
               onZoomToFamily(family);
             }}
             className={`px-2 py-1 rounded text-sm ${selectedFamily === family ? 'bg-white text-black' : 'bg-white/20'}`}
-            style={{ borderColor: getFamilyColor(family) }}
+            style={{ 
+              borderColor: getFamilyColor(family),
+              borderWidth: 2,
+              borderStyle: 'solid'
+            }}
           >
             {family}
           </button>

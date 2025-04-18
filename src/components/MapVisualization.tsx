@@ -19,6 +19,7 @@ export const MapVisualization = ({
 }: MapVisualizationProps) => {
   const [dimensions, setDimensions] = useState({ width: 800, height: 400 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [zoomApplied, setZoomApplied] = useState(false);
   
   useEffect(() => {
     const updateDimensions = () => {
@@ -35,11 +36,19 @@ export const MapVisualization = ({
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
+  // Reset zoom applied state when zoom coordinates change
+  useEffect(() => {
+    if (zoomToCoordinates) {
+      setZoomApplied(false);
+    }
+  }, [zoomToCoordinates]);
+
   const getTransformedCoordinates = (lat: number, long: number) => {
     if (!zoomToCoordinates) {
       return projectLatLongToXY(lat, long, dimensions.width, dimensions.height);
     }
 
+    // If zoom coordinates are provided, transform the points
     const scale = zoomToCoordinates.scale;
     const centerX = dimensions.width / 2;
     const centerY = dimensions.height / 2;
@@ -54,6 +63,8 @@ export const MapVisualization = ({
     
     const dx = baseX - zoomCenterX;
     const dy = baseY - zoomCenterY;
+    
+    setZoomApplied(true);
     
     return [
       centerX + dx * scale,

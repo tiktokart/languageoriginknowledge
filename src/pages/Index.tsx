@@ -41,6 +41,7 @@ const Index = () => {
   }, []);
   
   const handleZoomToFamily = (family: string) => {
+    console.log("Zooming to family:", family);
     const familyLanguages = languages.filter(lang => lang.family === family);
     if (familyLanguages.length === 0) return;
     

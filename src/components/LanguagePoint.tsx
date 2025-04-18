@@ -12,7 +12,7 @@ interface LanguagePointProps {
 
 export const LanguagePoint = ({ x, y, language, isSelected, onClick }: LanguagePointProps) => {
   const color = getFamilyColor(language.family);
-  const size = isSelected ? 8 : 4;
+  const size = isSelected ? 10 : 4;
   
   return (
     <div 
@@ -24,9 +24,13 @@ export const LanguagePoint = ({ x, y, language, isSelected, onClick }: LanguageP
         height: `${size}px`,
         backgroundColor: color,
         boxShadow: isSelected ? `0 0 10px 2px ${color}` : 'none',
-        transform: 'translate(-50%, -50%)'
+        transform: 'translate(-50%, -50%)',
+        zIndex: isSelected ? 50 : 10
       }}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
       title={`${language.name} (${language.family})`}
     />
   );

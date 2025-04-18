@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { Language } from '@/lib/walsData';
 import { projectLatLongToXY } from '@/utils/mapProjection';
@@ -27,7 +26,6 @@ export const MapVisualization = ({
   
   const [zoom, setZoom] = useState(1);
   
-  // Update dimensions on mount and resize
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -43,27 +41,24 @@ export const MapVisualization = ({
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  // Reset zoom applied state when zoom coordinates change
   useEffect(() => {
     if (zoomToCoordinates) {
       setZoomApplied(false);
     }
   }, [zoomToCoordinates]);
 
-  // Set zoom applied when coordinates are being used
   useEffect(() => {
     if (zoomToCoordinates && !zoomApplied) {
       setZoomApplied(true);
     }
   }, [zoomToCoordinates, zoomApplied]);
 
-  // Auto-rotation effect
   useEffect(() => {
     const animateGlobe = () => {
       if (!isDragging) {
         setRotation(prev => ({
           x: prev.x,
-          y: prev.y + 0.1 // Slow rotation around y-axis
+          y: prev.y + 0.1
         }));
       }
       animationRef.current = requestAnimationFrame(animateGlobe);
@@ -78,9 +73,7 @@ export const MapVisualization = ({
     };
   }, [isDragging]);
 
-  // Mouse interaction handlers
   const handleMouseDown = (e: React.MouseEvent) => {
-    // Only set dragging if the target is the container itself, not a language point
     if ((e.target as HTMLElement).classList.contains('map-container')) {
       setIsDragging(true);
       setLastMousePosition({ x: e.clientX, y: e.clientY });
@@ -101,7 +94,6 @@ export const MapVisualization = ({
     }
   };
 
-  // Handle wheel zoom
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -116,7 +108,6 @@ export const MapVisualization = ({
     }
   }, []);
 
-  // Apply zoom when coordinates change
   useEffect(() => {
     if (zoomToCoordinates) {
       setZoom(zoomToCoordinates.scale);
@@ -136,14 +127,12 @@ export const MapVisualization = ({
     const centerX = dimensions.width / 2;
     const centerY = dimensions.height / 2;
     
-    // Apply rotation
     let dx = baseX - centerX;
     let dy = baseY - centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
     let angle = Math.atan2(dy, dx);
     angle += (rotation.y * Math.PI) / 180;
     
-    // Apply zoom
     const zoomedDistance = distance * zoom;
     const rotatedX = centerX + zoomedDistance * Math.cos(angle);
     const rotatedY = centerY + zoomedDistance * Math.sin(angle);
@@ -159,7 +148,7 @@ export const MapVisualization = ({
   return (
     <div 
       ref={containerRef} 
-      className="relative map-container w-full h-full overflow-hidden cursor-grab"
+      className="relative map-container w-full h-full overflow-hidden cursor-grab bg-[#1A1F2C]"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -170,10 +159,11 @@ export const MapVisualization = ({
         <img 
           src="/world-map.svg" 
           alt="World Map" 
-          className="w-full h-full object-cover opacity-30"
+          className="w-full h-full object-cover opacity-20"
           style={{
             transform: `rotate3d(1, 0, 0, ${rotation.x}deg) rotate3d(0, 1, 0, ${rotation.y}deg)`,
-            transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+            transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+            filter: 'brightness(0.7) contrast(1.2)'
           }}
         />
       </div>
@@ -186,6 +176,7 @@ export const MapVisualization = ({
             language={language}
             isSelected={selectedLanguage?.id === language.id}
             onClick={() => setSelectedLanguage(language)}
+            className="shadow-[0_0_10px_2px_rgba(255,255,255,0.3)]"
           />
         ))}
       </div>

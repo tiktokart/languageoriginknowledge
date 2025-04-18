@@ -8,16 +8,16 @@ interface LanguagePointProps {
   language: Language;
   isSelected: boolean;
   onClick: () => void;
+  className?: string;
 }
 
-export const LanguagePoint = ({ x, y, language, isSelected, onClick }: LanguagePointProps) => {
+export const LanguagePoint = ({ 
+  x, y, language, isSelected, onClick, className = '' 
+}: LanguagePointProps) => {
   const color = getFamilyColor(language.family);
   
-  // Calculate base size based on language frequency
   const getBaseSize = () => {
-    // Check if speakers property exists and is a number
-    const speakers = typeof language.speakers === 'number' ? language.speakers : 1;
-    // Log scale for better visualization
+    const speakers = language.speakers || 100000;
     const baseSize = Math.log10(speakers) * 2;
     return Math.max(3, Math.min(12, baseSize)); // Clamp between 3 and 12 pixels
   };
@@ -27,23 +27,27 @@ export const LanguagePoint = ({ x, y, language, isSelected, onClick }: LanguageP
   
   return (
     <div 
-      className={`absolute rounded-full cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-150 language-point ${isSelected ? 'selected z-50' : ''}`}
+      className={`absolute rounded-full cursor-pointer transform transition-all duration-300 ease-in-out hover:scale-150 language-point ${isSelected ? 'selected z-50' : ''} ${className}`}
       style={{
         left: `${x}px`,
         top: `${y}px`,
         width: `${size}px`,
         height: `${size}px`,
         backgroundColor: color,
-        boxShadow: isSelected ? `0 0 10px 2px ${color}` : 'none',
+        borderWidth: '1px',
+        borderColor: 'rgba(255,255,255,0.5)', // Subtle white border
+        boxShadow: isSelected 
+          ? `0 0 15px 3px ${color}, 0 0 10px 2px rgba(255,255,255,0.3)` 
+          : '0 0 5px 1px rgba(255,255,255,0.2)',
         transform: 'translate(-50%, -50%)',
         zIndex: isSelected ? 50 : 10,
-        pointerEvents: 'auto' // Ensure clicks are captured
+        pointerEvents: 'auto'
       }}
       onClick={(e) => {
         e.stopPropagation();
         onClick();
       }}
-      title={`${language.name} (${language.family}) - ${typeof language.speakers === 'number' ? language.speakers.toLocaleString() : 'Unknown'} speakers`}
+      title={`${language.name} (${language.family}) - ${language.speakers?.toLocaleString() || 'Unknown'} speakers`}
     />
   );
 };

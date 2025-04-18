@@ -1,50 +1,36 @@
 
 export const getFamilyColor = (family: string): string => {
   const colorMap: Record<string, string> = {
-    'Indo-European': '#FF5733',
-    'Sino-Tibetan': '#33FF57',
-    'Niger-Congo': '#3357FF',
-    'Austronesian': '#FF33A8',
-    'Afro-Asiatic': '#33FFF5',
-    'Dravidian': '#FFD700',
-    'Turkic': '#9932CC',
-    'Uralic': '#FF4500',
-    'Japonic': '#00FF00',
-    'Koreanic': '#FF00FF',
-    'Tai-Kadai': '#1E90FF',
-    'Mongolic': '#FF8C00',
-    'Hmong-Mien': '#FF1493',
-    'Austroasiatic': '#00BFFF',
-    'Language Isolate': '#964B00',
-    'Na-Dene': '#BA55D3', 
-    'Algic': '#008080',
-    'Iroquoian': '#800000',
-    'Uto-Aztecan': '#F08080',
-    'Eskimo-Aleut': '#4682B4',
-    'Arawakan': '#D2691E',
-    'Quechuan': '#556B2F',
-    'Tupian': '#8B008B',
-    'Carib': '#A0522D',
-    'Aymaran': '#6B8E23',
-    'Pama-Nyungan': '#483D8B',
-    'Nilo-Saharan': '#CD853F',
-    'Atlantic-Congo': '#008B8B',
-    'Mande': '#BDB76B',
-    'Mayan': '#8FBC8F',
-    'Mixe-Zoque': '#E9967A',
-    'Otomanguean': '#F4A460',
-    'Salishan': '#2E8B57',
-    'Siouan': '#BC8F8F',
+    'Indo-European': '#5D9CEC',     // Soft Blue
+    'Sino-Tibetan': '#48CFAD',      // Mint Green
+    'Niger-Congo': '#FC6E51',       // Soft Red
+    'Austronesian': '#EC87C0',      // Soft Pink
+    'Afro-Asiatic': '#4A89DC',      // Deep Blue
+    'Dravidian': '#F6BB42',         // Warm Yellow
+    'Turkic': '#8E44AD',            // Rich Purple
+    'Uralic': '#E9573F',            // Bright Orange
+    'Japonic': '#37BC9B',           // Teal
+    'Koreanic': '#D770AD',          // Bright Pink
+    'Tai-Kadai': '#3BAFB9',         // Turquoise
+    'Mongolic': '#F6B042',          // Golden Yellow
+    'Hmong-Mien': '#967ADC',        // Lavender
+    'Austroasiatic': '#3BAFB9',     // Turquoise
+    'Language Isolate': '#AC92EC',  // Soft Purple
+    'Na-Dene': '#ED5565',           // Coral
+    'Algic': '#4FC1E9',             // Sky Blue
+    'Iroquoian': '#A0D468',         // Lime Green
+    'Uto-Aztecan': '#EC87C0',       // Soft Pink
+    'Eskimo-Aleut': '#5D9CEC',      // Soft Blue
   };
 
-  // Fallback: generate a deterministic color for unknown families
+  // Generate a deterministic color for unknown families
   if (!colorMap[family]) {
     let hash = 0;
     for (let i = 0; i < family.length; i++) {
       hash = family.charCodeAt(i) + ((hash << 5) - hash);
     }
-    const color = Math.abs(hash).toString(16).substring(0, 6).padEnd(6, '0');
-    return `#${color}`;
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 70%, 60%)`;
   }
 
   return colorMap[family];

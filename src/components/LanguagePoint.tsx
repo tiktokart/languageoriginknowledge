@@ -12,7 +12,17 @@ interface LanguagePointProps {
 
 export const LanguagePoint = ({ x, y, language, isSelected, onClick }: LanguagePointProps) => {
   const color = getFamilyColor(language.family);
-  const size = isSelected ? 10 : 4;
+  
+  // Calculate base size based on language frequency
+  const getBaseSize = () => {
+    const speakers = language.speakers || 1;
+    // Log scale for better visualization
+    const baseSize = Math.log10(speakers) * 2;
+    return Math.max(3, Math.min(12, baseSize)); // Clamp between 3 and 12 pixels
+  };
+  
+  const baseSize = getBaseSize();
+  const size = isSelected ? baseSize * 1.5 : baseSize;
   
   return (
     <div 
@@ -31,7 +41,7 @@ export const LanguagePoint = ({ x, y, language, isSelected, onClick }: LanguageP
         e.stopPropagation();
         onClick();
       }}
-      title={`${language.name} (${language.family})`}
+      title={`${language.name} (${language.family}) - ${language.speakers || 'Unknown'} speakers`}
     />
   );
 };

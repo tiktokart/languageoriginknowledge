@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { Language } from '@/lib/walsData';
 import { projectLatLongToXY } from '@/utils/mapProjection';
@@ -24,6 +23,8 @@ export const MapVisualization = ({
   const [isDragging, setIsDragging] = useState(false);
   const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
   const animationRef = useRef<number | null>(null);
+  
+  const [zoom, setZoom] = useState(1);
   
   // Update dimensions on mount and resize
   useEffect(() => {
@@ -96,6 +97,28 @@ export const MapVisualization = ({
     }
   };
 
+  // Handle wheel zoom
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY * -0.001;
+      setZoom(prevZoom => Math.min(Math.max(0.5, prevZoom + delta), 4));
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      return () => container.removeEventListener('wheel', handleWheel);
+    }
+  }, []);
+
+  // Apply zoom when coordinates change
+  useEffect(() => {
+    if (zoomToCoordinates) {
+      setZoom(zoomToCoordinates.scale);
+    }
+  }, [zoomToCoordinates]);
+
   const handleMouseUp = () => {
     setIsDragging(false);
   };
@@ -105,49 +128,22 @@ export const MapVisualization = ({
   };
 
   const getTransformedCoordinates = (lat: number, long: number) => {
-    // Get base coordinates from the projection
     const [baseX, baseY] = projectLatLongToXY(lat, long, dimensions.width, dimensions.height);
     const centerX = dimensions.width / 2;
     const centerY = dimensions.height / 2;
     
-    // Apply rotation first (for both zoomed and non-zoomed view)
-    // Convert to polar coordinates
-    const dx = baseX - centerX;
-    const dy = baseY - centerY;
+    // Apply rotation
+    let dx = baseX - centerX;
+    let dy = baseY - centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    // Original angle
     let angle = Math.atan2(dy, dx);
-    
-    // Apply rotation (convert rotation from degrees to radians)
     angle += (rotation.y * Math.PI) / 180;
     
-    // Calculate rotated position
-    const rotatedX = centerX + distance * Math.cos(angle);
-    const rotatedY = centerY + distance * Math.sin(angle);
+    // Apply zoom
+    const zoomedDistance = distance * zoom;
+    const rotatedX = centerX + zoomedDistance * Math.cos(angle);
+    const rotatedY = centerY + zoomedDistance * Math.sin(angle);
     
-    // Now apply zoom if zoom coordinates are provided
-    if (zoomToCoordinates) {
-      // Get the center position for zooming
-      const [zoomCenterX, zoomCenterY] = projectLatLongToXY(
-        zoomToCoordinates.centerLat,
-        zoomToCoordinates.centerLong,
-        dimensions.width,
-        dimensions.height
-      );
-      
-      // Calculate the difference between the rotated point and zoom center
-      const dxZoom = rotatedX - zoomCenterX;
-      const dyZoom = rotatedY - zoomCenterY;
-      
-      // Apply the zoom scale and center in the view
-      return [
-        centerX + dxZoom * zoomToCoordinates.scale,
-        centerY + dyZoom * zoomToCoordinates.scale
-      ];
-    }
-    
-    // If no zoom, just return the rotated coordinates
     return [rotatedX, rotatedY];
   };
   

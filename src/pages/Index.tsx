@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { fetchWalsLanguages, Language } from '@/lib/walsData';
 import { FilterControls } from '@/components/FilterControls';
@@ -18,6 +17,7 @@ const Index = () => {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInfoOpen, setIsInfoOpen] = useState(true);
+  const [isAboutOpen, setIsAboutOpen] = useState(true);
   
   const [zoomToCoordinates, setZoomToCoordinates] = useState<{
     centerLat: number;
@@ -197,16 +197,20 @@ const Index = () => {
         </div>
         
         <div className="pointer-events-auto">
-          <Collapsible defaultOpen={true} className="w-full">
+          <Collapsible 
+            open={isAboutOpen} 
+            onOpenChange={setIsAboutOpen} 
+            className="w-full"
+          >
             <div className="bg-black/70 rounded-lg backdrop-blur-md border border-white/10 shadow-xl w-64">
               <div className="p-3 flex items-center justify-between">
                 <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200">
                   World Atlas of Language Structures
                 </h1>
                 <CollapsibleTrigger className="rounded-full hover:bg-white/10 p-1 transition-colors">
-                  {open => (
-                    open ? 
-                    <MinusCircle className="h-5 w-5 text-white/80" /> : 
+                  {isAboutOpen ? (
+                    <MinusCircle className="h-5 w-5 text-white/80" />
+                  ) : (
                     <PlusCircle className="h-5 w-5 text-white/80" />
                   )}
                 </CollapsibleTrigger>

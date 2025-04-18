@@ -15,7 +15,7 @@ export const FilterControls = ({
   onZoomToFamily 
 }: FilterControlsProps) => {
   return (
-    <div className="fixed left-0 top-0 p-4 bg-black/70 backdrop-blur-md rounded-br-lg text-white z-10">
+    <div className="fixed left-0 top-0 p-4 bg-black/70 backdrop-blur-md rounded-br-lg text-white z-50">
       <h3 className="text-lg font-semibold mb-2">Filter by Family</h3>
       <div className="flex flex-wrap gap-2">
         <button 

@@ -1,8 +1,10 @@
+
 import { Language } from '@/lib/walsData';
 import { getFamilyColor } from '@/utils/languageColors';
 import { X, BookOpen, History } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
+import LanguageAnalysisDialog from './LanguageAnalysisDialog';
 
 interface InfoPanelProps {
   language: Language | null;
@@ -96,6 +98,11 @@ export const InfoPanel = ({ language, onClose }: InfoPanelProps) => {
           <div className="font-medium">Longitude:</div>
           <div>{language.longitude.toFixed(2)}</div>
         </div>
+      </div>
+
+      {/* Analysis Button */}
+      <div className="mb-4 flex justify-center">
+        <LanguageAnalysisDialog language={language} />
       </div>
 
       {/* Historical Information Section */}

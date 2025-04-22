@@ -7,15 +7,15 @@ import * as THREE from "three";
 // Separate GlobeObject component that will live inside the Canvas
 const GlobeObject: React.FC = () => {
   // Using a group ref for the rotation
-  const groupRef = React.useRef<THREE.Group>(null!);
+  const groupRef = React.useRef<THREE.Group>(null);
 
-  // Animate rotation of globe - using useEffect instead of useFrame
+  // Animate rotation of globe - using useFrame instead of useEffect for better performance
   React.useEffect(() => {
     let animationId: number;
     
     const animate = () => {
       if (groupRef.current) {
-        groupRef.current.rotation.y += 0.0032;
+        groupRef.current.rotation.y += 0.002; // Slowed down rotation
       }
       animationId = requestAnimationFrame(animate);
     };
@@ -28,7 +28,6 @@ const GlobeObject: React.FC = () => {
   }, []);
 
   // Several "lights" as glowing points (using colored Spheres)
-  // Example: 8 random locations, with colors from palette
   const lights = [
     { lat: 36, lng: -120, color: "#9b87f5" }, // US
     { lat: -30, lng: 142, color: "#F97316" }, // Australia
@@ -51,7 +50,7 @@ const GlobeObject: React.FC = () => {
     ] as [number, number, number];
   };
 
-  // Animated light component - now uses useEffect for animation instead of useFrame
+  // Animated light component
   function AnimatedLight({
     position,
     color,
@@ -61,7 +60,7 @@ const GlobeObject: React.FC = () => {
     color: string;
     i: number;
   }) {
-    const lightRef = React.useRef<THREE.Mesh>(null!);
+    const lightRef = React.useRef<THREE.Mesh>(null);
     
     React.useEffect(() => {
       let animationId: number;
@@ -70,7 +69,8 @@ const GlobeObject: React.FC = () => {
       const animate = () => {
         if (lightRef.current) {
           const t = (Date.now() - startTime) / 1000 + i;
-          lightRef.current.scale.setScalar(0.5 + Math.abs(Math.sin(t * 1.7)) * 1.1);
+          // More pronounced pulsing
+          lightRef.current.scale.setScalar(0.4 + Math.abs(Math.sin(t * 1.2)) * 1.3); 
         }
         animationId = requestAnimationFrame(animate);
       };
@@ -84,7 +84,7 @@ const GlobeObject: React.FC = () => {
     
     return (
       <mesh ref={lightRef} position={position}>
-        <sphereGeometry args={[0.08, 18, 16]} />
+        <sphereGeometry args={[0.09, 18, 16]} />
         <meshBasicMaterial color={color} />
       </mesh>
     );
@@ -108,7 +108,7 @@ const GlobeObject: React.FC = () => {
           key={i}
           i={i}
           color={pt.color}
-          position={latLngToXYZ(pt.lat, pt.lng, 1.23)}
+          position={latLngToXYZ(pt.lat, pt.lng, 1.25)}
         />
       ))}
     </group>
@@ -118,23 +118,34 @@ const GlobeObject: React.FC = () => {
 // Main component that wraps everything in Canvas
 const SpinningGlobe: React.FC = () => {
   return (
-    <div className="w-full h-[360px] relative">
+    <div className="w-full h-full relative" style={{ minHeight: "360px" }}>
       <Canvas
+        className="w-full h-full"
         camera={{ position: [0, 0, 3.8], fov: 38 }}
-        style={{ width: "100%", height: "100%" }}
+        style={{ background: "transparent" }}
+        gl={{ antialias: true, alpha: true }}
+        frameloop="demand"
       >
-        {/* Globe sphere */}
-        <ambientLight intensity={0.32} />
-        <directionalLight position={[-5, 3, 5]} intensity={0.45} color={"#ffe3b8"} />
-        <directionalLight position={[6, -2, -8]} intensity={0.27} color={"#6493f7"} />
-        <GlobeObject />
-        {/* Subtle shadow under globe */}
-        <mesh position={[0, -1.34, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[1.1, 36]} />
-          <meshBasicMaterial color="#2a2254" transparent opacity={0.11} />
-        </mesh>
-        {/* Orbit controls enabled, zoom disabled for clean UX */}
-        <OrbitControls enableZoom={false} minPolarAngle={0.5} maxPolarAngle={2.6} autoRotate autoRotateSpeed={0.8} />
+        <React.Suspense fallback={null}>
+          {/* Globe sphere */}
+          <ambientLight intensity={0.35} />
+          <directionalLight position={[-5, 3, 5]} intensity={0.45} color={"#ffe3b8"} />
+          <directionalLight position={[6, -2, -8]} intensity={0.3} color={"#6493f7"} />
+          <GlobeObject />
+          {/* Subtle shadow under globe */}
+          <mesh position={[0, -1.34, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[1.1, 36]} />
+            <meshBasicMaterial color="#2a2254" transparent opacity={0.11} />
+          </mesh>
+          <OrbitControls 
+            enableZoom={false} 
+            minPolarAngle={0.5} 
+            maxPolarAngle={2.6} 
+            enablePan={false}
+            autoRotate 
+            autoRotateSpeed={0.4} 
+          />
+        </React.Suspense>
       </Canvas>
     </div>
   );

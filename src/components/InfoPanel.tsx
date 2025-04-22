@@ -5,6 +5,7 @@ import { X, BookOpen, History } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
 import LanguageAnalysisDialog from './LanguageAnalysisDialog';
+import AttributeTreeDialog from './AttributeTreeDialog';
 
 interface InfoPanelProps {
   language: Language | null;
@@ -69,9 +70,9 @@ export const InfoPanel = ({ language, onClose }: InfoPanelProps) => {
     // If the language family is not found in the map, return a "no data" object
     if (!familyHistoryMap[language.family]) {
       return {
-        period: 'No data in datasets',
-        evolution: 'No data in datasets',
-        derivedLanguages: ['No data in datasets']
+        period: 'no data in datasets',
+        evolution: 'no data in datasets',
+        derivedLanguages: ['no data in datasets']
       };
     }
 
@@ -100,9 +101,10 @@ export const InfoPanel = ({ language, onClose }: InfoPanelProps) => {
         </div>
       </div>
 
-      {/* Analysis Button */}
-      <div className="mb-4 flex justify-center">
+      {/* Analysis Buttons */}
+      <div className="mb-4 flex flex-col gap-2 justify-center items-center">
         <LanguageAnalysisDialog language={language} />
+        <AttributeTreeDialog language={language} />
       </div>
 
       {/* Historical Information Section */}

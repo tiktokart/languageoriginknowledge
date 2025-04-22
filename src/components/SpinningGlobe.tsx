@@ -6,15 +6,16 @@ import * as THREE from "three";
 
 // Separate GlobeObject component that will live inside the Canvas
 const GlobeObject: React.FC = () => {
-  const meshRef = React.useRef<THREE.Mesh>(null!);
+  // Changed from meshRef to groupRef and corrected the type to THREE.Group
+  const groupRef = React.useRef<THREE.Group>(null!);
 
-  // Animate rotation of globe - using useFrame which must be inside Canvas
+  // Animate rotation of globe - using useEffect instead of useFrame
   React.useEffect(() => {
     let animationId: number;
     
     const animate = () => {
-      if (meshRef.current) {
-        meshRef.current.rotation.y += 0.0032;
+      if (groupRef.current) {
+        groupRef.current.rotation.y += 0.0032;
       }
       animationId = requestAnimationFrame(animate);
     };
@@ -90,7 +91,7 @@ const GlobeObject: React.FC = () => {
   }
 
   return (
-    <group ref={meshRef}>
+    <group ref={groupRef}>
       {/* Sphere with blue/purple gradient */}
       <Sphere args={[1.2, 48, 32]}>
         <meshStandardMaterial

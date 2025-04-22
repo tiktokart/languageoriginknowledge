@@ -1,12 +1,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-
-interface Language {
-  id: string;
-  name: string;
-  family?: string;
-}
+import { Language } from "@/lib/walsData";
 
 interface ExpandableLanguageListProps {
   languages: Language[];

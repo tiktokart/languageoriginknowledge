@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { fetchWalsLanguages, Language } from "@/lib/walsData";
 import {
@@ -83,7 +82,11 @@ function buildFeatureTree(languages: Language[]) {
   return tree;
 }
 
-const TreeDiagram = ({ tree }) => {
+interface TreeDiagramProps {
+  tree: Record<string, Record<string, Record<string, Language[]>>>;
+}
+
+const TreeDiagram = ({ tree }: TreeDiagramProps) => {
   const [openCategory, setOpenCategory] = useState<string | null>(null);
   const [activeGraph, setActiveGraph] = useState<{
     category: string;
@@ -233,7 +236,6 @@ const FeatureTreeAnalysisDialog = () => {
   useEffect(() => {
     if (!open) return;
     
-    // The fix: properly handle the Promise with async data
     const fetchData = async () => {
       try {
         const data = await fetchWalsLanguages();

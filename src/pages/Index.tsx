@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchWalsLanguages, Language } from '@/lib/walsData';
@@ -165,23 +166,19 @@ const Index = () => {
   
   return (
     <div className="h-screen overflow-hidden relative">
-      <div className="absolute top-4 left-4 z-50">
-        <Button 
-          variant="outline" 
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Exit
-        </Button>
-      </div>
-
       <MapVisualization 
         languages={filteredLanguages} 
         selectedLanguage={selectedLanguage} 
         setSelectedLanguage={setSelectedLanguage}
         zoomToCoordinates={zoomToCoordinates}
       />
+      
+      <div className="absolute top-4 left-20 z-50">
+        <SearchBar 
+          languages={languages}
+          onSelectLanguage={setSelectedLanguage}
+        />
+      </div>
       
       <div className="absolute top-20 right-4 z-10">
         <FilterControls 
@@ -190,6 +187,18 @@ const Index = () => {
           onSelectFamily={setSelectedFamily}
           onZoomToFamily={handleZoomToFamily}
         />
+      </div>
+      
+      {/* Centered Exit Button */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 opacity-70 hover:opacity-100 transition-opacity">
+        <Button 
+          variant="secondary" 
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 bg-black/60 hover:bg-black/80 text-white border border-white/20 px-6 py-5 rounded-full shadow-lg"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Exit
+        </Button>
       </div>
       
       <div className="fixed left-0 right-0 bottom-4 z-10 flex justify-between items-end px-4">

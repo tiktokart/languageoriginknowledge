@@ -23,6 +23,47 @@ const MAJOR_CATEGORIES = [
   "Nominal Categories",
 ];
 
+// Helper: Known linear orders for certain category values
+const KNOWN_ORDERS: Record<string, string[]> = {
+  // Example for "Phonology" - "Vowel Quality Inventory"
+  "Vowel Quality Inventory": [
+    "Small",
+    "Average",
+    "Moderately Large",
+    "Large",
+    "Very Large (>14)"
+  ],
+  // Expand with other features as needed:
+  "Consonant Inventories": [
+    "Small",
+    "Moderately small",
+    "Average",
+    "Moderately large",
+    "Large",
+    "Very Large"
+  ],
+  "Syllable Structure": [
+    "Simple",
+    "Moderately complex",
+    "Complex",
+    "Highly complex"
+  ],
+  // Add more known orders here as detected in your dataset
+};
+
+function sortValuesLinearlyOrAlphabetically(featureName: string, values: Record<string, unknown>) {
+  const linearOrder = KNOWN_ORDERS[featureName];
+  const keys = Object.keys(values);
+
+  if (linearOrder) {
+    // Order according to known linear order
+    return [...linearOrder.filter((v) => keys.includes(v)), ...keys.filter((v) => !linearOrder.includes(v)).sort()];
+  } else {
+    // Fallback: sort values alphabetically
+    return keys.sort();
+  }
+}
+
 function buildFeatureTree(languages: Language[]) {
   const tree: Record<
     string,
@@ -89,7 +130,7 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
                         {featureName}
                       </div>
                       <ul className="ml-2 border-l-2 border-dashed border-blue-200 pl-4 space-y-2">
-                        {Object.entries(values).map(([value, langs]) => (
+                        {sortValuesLinearlyOrAlphabetically(featureName, values).map((value) => (
                           <li key={value} className="flex items-start gap-2">
                             <div
                               className={cn(
@@ -115,11 +156,11 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
                                   {value}
                                 </span>
                                 <span className="ml-1 text-[10px] text-slate-500">
-                                  ({langs.length})
+                                  ({(values[value] || []).length})
                                 </span>
                               </div>
                               <ul className="ml-4 space-y-0.5">
-                                <ExpandableLanguageList languages={langs} maxVisible={5} />
+                                <ExpandableLanguageList languages={values[value] || []} maxVisible={5} />
                               </ul>
                             </div>
                           </li>
@@ -148,10 +189,14 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
                   </span>
                   <br />
                   <span className="text-xs text-slate-500">
-                    Top 10 languages (colored) for this attribute value
+                    Showing value breakdown (count in parentheses) from high to low
                   </span>
                 </div>
-                <FeatureValueChart languages={langs} />
+                <FeatureValueChart
+                  languagesGroupedByValue={
+                    tree[activeGraph.category][activeGraph.feature]
+                  }
+                />
 
                 <div>
                   <div className="mt-7 mb-1 text-[13px] text-blue-800 font-medium text-center">

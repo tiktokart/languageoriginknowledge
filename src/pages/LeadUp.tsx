@@ -2,8 +2,8 @@
 import { useNavigate } from "react-router-dom";
 import { Globe, ArrowRight } from "lucide-react";
 
-// Dots config with positions/animate duration
 const DOTS = [
+  // Spread dots across the page representing different database/global spread
   { left: "29%", top: "22%", color: "#9b87f5", duration: 0.36 },
   { left: "62%", top: "17%", color: "#F97316", duration: 0.44 },
   { left: "76%", top: "31%", color: "#0EA5E9", duration: 0.55 },
@@ -15,47 +15,8 @@ const DOTS = [
   { left: "70%", top: "85%", color: "#1EAEDB", duration: 0.57 },
 ];
 
-// Helper to convert percent (string) to px (number), given container size
-function percentToPx(percent: string, max: number): number {
-  return (parseFloat(percent) / 100) * max;
-}
-
 export default function LeadUp() {
   const navigate = useNavigate();
-
-  // We'll use a ref to get the container size for accurate line positioning
-  // Since container is 100vw/100vh, we can just use window.innerWidth/Height
-  // For SSR safety, default to 1280x720 and update after mount
-  const [dimensions, setDimensions] = React.useState({
-    width: 1280,
-    height: 720,
-  });
-
-  React.useEffect(() => {
-    function handleResize() {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    }
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Precompute all the lines that connect every dot to every other dot (no duplicates)
-  const lines: Array<[number, number]> = [];
-  for (let i = 0; i < DOTS.length; i++) {
-    for (let j = i + 1; j < DOTS.length; j++) {
-      lines.push([i, j]);
-    }
-  }
-
-  // Calculate dot coordinates in px for line positions
-  const dotCoords = DOTS.map(dot => ({
-    x: percentToPx(dot.left, dimensions.width),
-    y: percentToPx(dot.top, dimensions.height),
-  }));
 
   return (
     <div
@@ -72,34 +33,8 @@ export default function LeadUp() {
         backgroundPosition: "center"
       }}
     >
-      {/* Overlay for connecting lines and dots */}
+      {/* Pulsing lights spread across the page */}
       <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
-        {/* SVG lines between dots */}
-        <svg
-          width={dimensions.width}
-          height={dimensions.height}
-          className="absolute z-0 pointer-events-none"
-          style={{ inset: 0, width: "100vw", height: "100vh" }}
-        >
-          {lines.map(([a, b], idx) => (
-            <line
-              key={idx}
-              x1={dotCoords[a].x}
-              y1={dotCoords[a].y}
-              x2={dotCoords[b].x}
-              y2={dotCoords[b].y}
-              stroke="#fff"
-              strokeWidth={2}
-              className="animate-line-pulse"
-              style={{
-                opacity: 0.7,
-                filter: "drop-shadow(0 0 6px #fff)",
-                strokeDasharray: 3,
-              }}
-            />
-          ))}
-        </svg>
-        {/* Pulsing lights (dots) */}
         {DOTS.map((dot, idx) => (
           <span
             key={idx}
@@ -114,11 +49,11 @@ export default function LeadUp() {
               filter: "blur(0.3px)",
               boxShadow: `0 0 12px 6px ${dot.color}`,
               zIndex: 2,
-              animationDuration: `${dot.duration}s`,
+              animationDuration: `${dot.duration}s`
             }}
           />
         ))}
-        {/* Local animation definitions */}
+        {/* Local animation definition */}
         <style>
           {`
             @keyframes pulse-dot {
@@ -128,14 +63,6 @@ export default function LeadUp() {
             }
             .animate-dot-pulse {
               animation: pulse-dot 0.5s infinite;
-            }
-            @keyframes pulse-line {
-              0% { opacity: 1; }
-              50% { opacity: 0.2; }
-              100% { opacity: 1; }
-            }
-            .animate-line-pulse {
-              animation: pulse-line 0.2s infinite;
             }
           `}
         </style>

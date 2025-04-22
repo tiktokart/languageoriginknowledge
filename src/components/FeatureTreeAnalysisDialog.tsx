@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { fetchWalsLanguages, Language } from "@/lib/walsData";
 import {
@@ -239,7 +240,8 @@ const FeatureTreeAnalysisDialog = () => {
     const fetchData = async () => {
       try {
         const data = await fetchWalsLanguages();
-        setLanguages(data);
+        // Fix: Use functional update pattern to avoid type mismatch
+        setLanguages(() => data);
       } catch (error) {
         console.error("Error fetching language data:", error);
       }

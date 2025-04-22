@@ -1,11 +1,5 @@
-
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
-
-interface Language {
-  id: string;
-  name: string;
-  family?: string;
-}
+import { Language } from "@/lib/walsData";
 
 interface FeatureValueChartProps {
   languagesGroupedByValue: Record<string, Language[]>;

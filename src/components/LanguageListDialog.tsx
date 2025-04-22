@@ -1,11 +1,6 @@
 
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-
-interface Language {
-  id: string;
-  name: string;
-  family?: string;
-}
+import { Language } from "@/lib/walsData";
 
 interface LanguageListDialogProps {
   open: boolean;

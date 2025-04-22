@@ -6,7 +6,7 @@ import {
   DialogTrigger,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tree } from "lucide-react";
+import { Trees } from "lucide-react";  // Changed from 'Tree' to 'Trees'
 import { cn } from "@/lib/utils";
 
 // Color palette for categories for pedagogy style
@@ -48,7 +48,7 @@ const AttributeTreeDialog = ({ language }: AttributeTreeDialogProps) => {
     <Dialog>
       <DialogTrigger asChild>
         <button className="flex items-center gap-1 text-sm bg-white/10 rounded-full px-3 py-1.5 hover:bg-white/20 transition-colors">
-          <Tree size={14} />
+          <Trees size={14} />  {/* Updated icon name */}
           <span>Attribute Family Tree</span>
         </button>
       </DialogTrigger>

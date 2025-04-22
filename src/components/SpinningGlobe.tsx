@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 // Separate GlobeObject component that will live inside the Canvas
 const GlobeObject: React.FC = () => {
-  // Changed from meshRef to groupRef and corrected the type to THREE.Group
+  // Using a group ref for the rotation
   const groupRef = React.useRef<THREE.Group>(null!);
 
   // Animate rotation of globe - using useEffect instead of useFrame
@@ -118,23 +118,25 @@ const GlobeObject: React.FC = () => {
 // Main component that wraps everything in Canvas
 const SpinningGlobe: React.FC = () => {
   return (
-    <Canvas
-      camera={{ position: [0, 0, 3.8], fov: 38 }}
-      style={{ width: "100%", height: "360px" }}
-    >
-      {/* Globe sphere */}
-      <ambientLight intensity={0.32} />
-      <directionalLight position={[-5, 3, 5]} intensity={0.45} color={"#ffe3b8"} />
-      <directionalLight position={[6, -2, -8]} intensity={0.27} color={"#6493f7"} />
-      <GlobeObject />
-      {/* Subtle shadow under globe */}
-      <mesh position={[0, -1.34, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[1.1, 36]} />
-        <meshBasicMaterial color="#2a2254" transparent opacity={0.11} />
-      </mesh>
-      {/* Orbit controls enabled, zoom disabled for clean UX */}
-      <OrbitControls enableZoom={false} minPolarAngle={0.5} maxPolarAngle={2.6} autoRotate autoRotateSpeed={0.8} />
-    </Canvas>
+    <div className="w-full h-[360px] relative">
+      <Canvas
+        camera={{ position: [0, 0, 3.8], fov: 38 }}
+        style={{ width: "100%", height: "100%" }}
+      >
+        {/* Globe sphere */}
+        <ambientLight intensity={0.32} />
+        <directionalLight position={[-5, 3, 5]} intensity={0.45} color={"#ffe3b8"} />
+        <directionalLight position={[6, -2, -8]} intensity={0.27} color={"#6493f7"} />
+        <GlobeObject />
+        {/* Subtle shadow under globe */}
+        <mesh position={[0, -1.34, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[1.1, 36]} />
+          <meshBasicMaterial color="#2a2254" transparent opacity={0.11} />
+        </mesh>
+        {/* Orbit controls enabled, zoom disabled for clean UX */}
+        <OrbitControls enableZoom={false} minPolarAngle={0.5} maxPolarAngle={2.6} autoRotate autoRotateSpeed={0.8} />
+      </Canvas>
+    </div>
   );
 };
 

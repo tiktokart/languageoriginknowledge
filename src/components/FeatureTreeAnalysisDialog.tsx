@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { fetchWalsLanguages, Language } from "@/lib/walsData";
 import {
@@ -9,6 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Grid2x2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ExpandableLanguageList from "./ExpandableLanguageList";
+import FeatureValueChart from "./FeatureValueChart";
 
 // Define the feature categories to group by
 const MAJOR_CATEGORIES = [
@@ -54,23 +55,23 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => (
         <h2 className="text-lg font-bold mb-2 text-blue-900">{category}</h2>
         <div className="flex flex-wrap gap-6">
           {Object.entries(features).map(([featureName, values]) => (
-            <div key={featureName} className="min-w-[220px]">
+            <div key={featureName} className="min-w-[260px] max-w-full">
               <div className="font-semibold text-blue-700 bg-slate-100 rounded px-2 py-1 mb-3">{featureName}</div>
-              <ul className="ml-2 border-l-2 border-dashed border-blue-300 pl-4 space-y-1">
+              <ul className="ml-2 border-l-2 border-dashed border-blue-300 pl-4 space-y-3">
                 {Object.entries(values).map(([value, langs]) => (
-                  <li key={value}>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs bg-blue-50 px-2 py-0.5 rounded whitespace-nowrap">{value}</span>
-                      <span className="ml-1 text-[10px] text-slate-500">({langs.length})</span>
+                  <li key={value} className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs bg-blue-50 px-2 py-0.5 rounded whitespace-nowrap">{value}</span>
+                        <span className="ml-1 text-[10px] text-slate-500">({langs.length})</span>
+                      </div>
+                      <ul className="ml-4 space-y-0.5">
+                        <ExpandableLanguageList languages={langs} maxVisible={5} />
+                      </ul>
                     </div>
-                    <ul className="ml-4 space-y-0.5">
-                      {langs.slice(0, 5).map((lang) => (
-                        <li key={lang.id} className="text-xs text-slate-700 truncate">{lang.name}</li>
-                      ))}
-                      {langs.length > 5 ? (
-                        <li className="text-xs italic text-gray-400">+{langs.length - 5} more</li>
-                      ) : null}
-                    </ul>
+                    <div className="pt-2">
+                      <FeatureValueChart languages={langs} />
+                    </div>
                   </li>
                 ))}
               </ul>

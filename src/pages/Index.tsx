@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { fetchWalsLanguages, Language } from '@/lib/walsData';
 import { FilterControls } from '@/components/FilterControls';
@@ -9,6 +8,7 @@ import { StatsDisplay } from '@/components/StatsDisplay';
 import { SearchBar } from '@/components/SearchBar';
 import { MinusCircle, PlusCircle } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import FeatureTreeAnalysisDialog from "@/components/FeatureTreeAnalysisDialog";
 
 const Index = () => {
   const [languages, setLanguages] = useState<Language[]>([]);
@@ -184,19 +184,17 @@ const Index = () => {
         />
       </div>
       
-      {/* Bottom bar with fixed width containers and proper spacing */}
       <div className="fixed left-0 right-0 bottom-4 z-10 flex justify-between items-end px-4">
-        <div className="pointer-events-auto">
+        <div className="flex gap-2 pointer-events-auto items-end">
           <MacroareaFilter
             selectedArea={selectedArea}
             setSelectedArea={setSelectedArea}
           />
+          <FeatureTreeAnalysisDialog />
         </div>
-        
         <div className="pointer-events-auto">
           <StatsDisplay languages={filteredLanguages} />
         </div>
-        
         <div className="pointer-events-auto">
           <Collapsible 
             open={isAboutOpen} 

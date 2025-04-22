@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { fetchWalsLanguages, Language } from "@/lib/walsData";
 import {
@@ -231,7 +232,18 @@ const FeatureTreeAnalysisDialog = () => {
 
   useEffect(() => {
     if (!open) return;
-    fetchWalsLanguages().then(setLanguages);
+    
+    // The fix: properly handle the Promise with async data
+    const fetchData = async () => {
+      try {
+        const data = await fetchWalsLanguages();
+        setLanguages(data);
+      } catch (error) {
+        console.error("Error fetching language data:", error);
+      }
+    };
+    
+    fetchData();
   }, [open]);
 
   const tree = buildFeatureTree(languages);

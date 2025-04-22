@@ -35,27 +35,54 @@ function getTopLanguages(languages: Language[], limit = 10) {
 const FeatureValueChart: React.FC<FeatureValueChartProps> = ({ languages }) => {
   if (!languages.length) return null;
 
+  // Group languages by family to count them
+  const familyCounts: Record<string, number> = {};
+  languages.forEach((lang) => {
+    const family = lang.family || "Unknown";
+    familyCounts[family] = (familyCounts[family] || 0) + 1;
+  });
+
   const data = getTopLanguages(languages).map((lang, idx) => ({
     id: lang.id,
     name: lang.name,
     family: lang.family ?? "Unknown",
     idx,
-    value: 1, // All are shown as '1', bar is just for visualization. Adjust if you want another metric.
+    // Use the family count (number of related languages) as the value
+    value: familyCounts[lang.family ?? "Unknown"] || 1,
   }));
+
+  // Find the maximum value for domain scaling
+  const maxValue = Math.max(...data.map(item => item.value));
 
   return (
     <div className="w-full h-64 flex-shrink-0">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} layout="vertical" margin={{ left: 10, right: 10, top: 10, bottom: 10 }}>
-          <XAxis type="number" hide domain={[0, 1]} />
+          <XAxis 
+            type="number" 
+            domain={[0, maxValue]} 
+            tick={{ fontSize: 12 }}
+            stroke="#888"
+            label={{ value: "Number of Languages in Family", position: "insideBottom", offset: -5, fill: "#555" }}
+          />
           <YAxis
             dataKey="name"
             type="category"
             width={120}
             tick={{ fontSize: 12 }}
             stroke="#888"
+            label={{ value: "Language Name", angle: -90, position: "insideLeft", style: { textAnchor: 'middle' }, fill: "#555" }}
           />
-          <Bar dataKey="value" isAnimationActive={false}>
+          <Bar 
+            dataKey="value" 
+            isAnimationActive={false} 
+            label={{ 
+              position: "right", 
+              fill: "#333", 
+              fontSize: 10,
+              formatter: (value: number) => `${value}`
+            }}
+          >
             {data.map((entry, idx) => (
               <Cell key={entry.id} fill={COLORS[idx % COLORS.length]} />
             ))}
@@ -64,11 +91,11 @@ const FeatureValueChart: React.FC<FeatureValueChartProps> = ({ languages }) => {
             contentStyle={{ background: "#fff", fontSize: "12px", borderRadius: "6px" }}
             itemStyle={{ color: "#403E43" }}
             labelFormatter={label => `Language: ${label}`}
-            formatter={(_, __, props) => {
+            formatter={(value, name, props) => {
               // Show language and family
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const payload = (props && (props as any).payload) || {};
-              return [`Family: ${payload.family ?? ""}`, payload.name];
+              return [`${value} languages in family`, `Family: ${payload.family ?? ""}`];
             }}
           />
         </BarChart>

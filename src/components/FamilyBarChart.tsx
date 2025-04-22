@@ -58,12 +58,14 @@ const FamilyBarChart: React.FC<FamilyBarChartProps> = ({ languages }) => {
             textAnchor="end"
             height={60}
             stroke="#888"
+            label={{ value: "Language Family", position: "insideBottom", offset: -5, fill: "#555" }}
           />
           <YAxis
             dataKey="count"
             tick={{ fontSize: 12 }}
             allowDecimals={false}
             stroke="#888"
+            label={{ value: "Number of Languages", angle: -90, position: "insideLeft", style: { textAnchor: 'middle' }, fill: "#555" }}
           />
           <Bar dataKey="count">
             {data.map((entry, idx) => (

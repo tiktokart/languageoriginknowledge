@@ -57,7 +57,7 @@ export default function LeadUp() {
               day, creating a free open platform for computing on the entire world.
             </p>
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/visualization")}
               className="group bg-gradient-to-tr from-cyan-600 via-blue-700 to-indigo-800 hover:from-blue-700 hover:to-indigo-900 text-white font-semibold rounded-full px-7 py-3 shadow-xl flex items-center transition-all duration-200 animate-fade-in border-2 border-blue-900"
               aria-label="Explore Interactive Visualization"
             >

@@ -63,9 +63,9 @@ interface FamilyLineageDialogProps {
 
 const SOURCES = [
   { key: "wals", label: "WALS Families" },
-  { key: "glottolog", label: "Glottolog" },
-  { key: "gled", label: "Global Lexical Database (GLED)" },
-  { key: "phylo", label: "Phylogenetic Analysis" },
+  { key: "glottolog", label: "Glottolog (No API Key)" },
+  { key: "gled", label: "Global Lexical Database (GLED) (No API Key)" },
+  { key: "phylo", label: "Phylogenetic Analysis (No API Key)" },
 ] as const;
 
 type SourceKey = (typeof SOURCES)[number]["key"];

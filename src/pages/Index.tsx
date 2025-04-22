@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchWalsLanguages, Language } from '@/lib/walsData';
 import { FilterControls } from '@/components/FilterControls';
 import { MapVisualization } from '@/components/MapVisualization';
@@ -6,9 +7,10 @@ import { MacroareaFilter } from '@/components/MacroareaFilter';
 import { InfoPanel } from '@/components/InfoPanel';
 import { StatsDisplay } from '@/components/StatsDisplay';
 import { SearchBar } from '@/components/SearchBar';
-import { MinusCircle, PlusCircle } from 'lucide-react';
+import { MinusCircle, PlusCircle, ArrowLeft } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import FeatureTreeAnalysisDialog from "@/components/FeatureTreeAnalysisDialog";
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [languages, setLanguages] = useState<Language[]>([]);
@@ -28,6 +30,8 @@ const Index = () => {
   
   const families = [...new Set(languages.map(lang => lang.family))];
   
+  const navigate = useNavigate();
+
   useEffect(() => {
     const loadLanguages = async () => {
       try {
@@ -161,19 +165,23 @@ const Index = () => {
   
   return (
     <div className="h-screen overflow-hidden relative">
+      <div className="absolute top-4 left-4 z-50">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Exit
+        </Button>
+      </div>
+
       <MapVisualization 
         languages={filteredLanguages} 
         selectedLanguage={selectedLanguage} 
         setSelectedLanguage={setSelectedLanguage}
         zoomToCoordinates={zoomToCoordinates}
       />
-      
-      <div className="absolute top-4 left-20 z-50">
-        <SearchBar 
-          languages={languages}
-          onSelectLanguage={setSelectedLanguage}
-        />
-      </div>
       
       <div className="absolute top-20 right-4 z-10">
         <FilterControls 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { fetchWalsLanguages, Language } from "@/lib/walsData";
 import {
@@ -12,8 +11,8 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import { cn } from "@/lib/utils";
 import ExpandableLanguageList from "./ExpandableLanguageList";
 import FeatureValueChart from "./FeatureValueChart";
+import FamilyBarChart from "./FamilyBarChart";
 
-// Define the feature categories to group by
 const MAJOR_CATEGORIES = [
   "Phonology",
   "Word Order",
@@ -23,7 +22,6 @@ const MAJOR_CATEGORIES = [
   "Nominal Categories",
 ];
 
-// Returns a nested structure featureTree[category][featureName][featureValue] = [array of languages]
 function buildFeatureTree(languages: Language[]) {
   const tree: Record<
     string,
@@ -50,35 +48,45 @@ interface TreeDiagramProps {
   tree: ReturnType<typeof buildFeatureTree>;
 }
 
-// Collapsible tree: categories as Accordions, "left" lists, "right" graph per value
 const TreeDiagram = ({ tree }: TreeDiagramProps) => {
-  // Collapse/expand state for each category and feature
   const [openCategory, setOpenCategory] = useState<string | null>(null);
-  // Track [category,feature,value] for which graph to show on the right panel
   const [activeGraph, setActiveGraph] = useState<{
     category: string;
     feature: string;
     value: string;
   } | null>(null);
 
-  // Reset activeGraph when category changes
   useEffect(() => {
     setActiveGraph(null);
   }, [openCategory]);
 
   return (
     <div className="flex flex-row gap-4 w-full max-h-[70vh]">
-      {/* LEFT: Collapsible categories, features, values, language lists */}
       <div className="flex-1 min-w-0 overflow-y-auto pr-4">
-        <Accordion type="single" collapsible value={openCategory ?? undefined} onValueChange={setOpenCategory}>
+        <Accordion
+          type="single"
+          collapsible
+          value={openCategory ?? undefined}
+          onValueChange={setOpenCategory}
+        >
           {Object.entries(tree).map(([category, features]) => (
-            <AccordionItem key={category} value={category} className={cn("bg-white/90 rounded-xl shadow-sm border border-slate-200 mb-3")}>
-              <AccordionTrigger className="text-lg font-bold text-blue-900 px-3 py-2">{category}</AccordionTrigger>
+            <AccordionItem
+              key={category}
+              value={category}
+              className={cn(
+                "bg-white/90 rounded-xl shadow-sm border border-slate-200 mb-3"
+              )}
+            >
+              <AccordionTrigger className="text-lg font-bold text-blue-900 px-3 py-2">
+                {category}
+              </AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col gap-1">
                   {Object.entries(features).map(([featureName, values]) => (
                     <div key={featureName} className="mb-2">
-                      <div className="font-semibold text-blue-700 bg-slate-100 rounded px-2 py-1 mb-2">{featureName}</div>
+                      <div className="font-semibold text-blue-700 bg-slate-100 rounded px-2 py-1 mb-2">
+                        {featureName}
+                      </div>
                       <ul className="ml-2 border-l-2 border-dashed border-blue-200 pl-4 space-y-2">
                         {Object.entries(values).map(([value, langs]) => (
                           <li key={value} className="flex items-start gap-2">
@@ -86,9 +94,9 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
                               className={cn(
                                 "flex-1 min-w-0 cursor-pointer rounded hover:bg-blue-50 px-1 py-0.5 transition",
                                 activeGraph &&
-                                  activeGraph.category === category &&
-                                  activeGraph.feature === featureName &&
-                                  activeGraph.value === value
+                                activeGraph.category === category &&
+                                activeGraph.feature === featureName &&
+                                activeGraph.value === value
                                   ? "bg-blue-100"
                                   : ""
                               )}
@@ -102,8 +110,12 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
                               title="Click to see top 10 language graph on right"
                             >
                               <div className="flex items-center gap-1">
-                                <span className="text-xs bg-blue-50 px-2 py-0.5 rounded whitespace-nowrap">{value}</span>
-                                <span className="ml-1 text-[10px] text-slate-500">({langs.length})</span>
+                                <span className="text-xs bg-blue-50 px-2 py-0.5 rounded whitespace-nowrap">
+                                  {value}
+                                </span>
+                                <span className="ml-1 text-[10px] text-slate-500">
+                                  ({langs.length})
+                                </span>
                               </div>
                               <ul className="ml-4 space-y-0.5">
                                 <ExpandableLanguageList languages={langs} maxVisible={5} />
@@ -121,7 +133,6 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
         </Accordion>
       </div>
 
-      {/* RIGHT: Chart for active selection */}
       <div className="flex-1 min-w-0 flex flex-col bg-white/90 rounded-xl border border-slate-200 shadow-md p-5 h-full justify-center">
         {activeGraph ? (
           (() => {
@@ -140,6 +151,13 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
                   </span>
                 </div>
                 <FeatureValueChart languages={langs} />
+
+                <div>
+                  <div className="mt-7 mb-1 text-[13px] text-blue-800 font-medium text-center">
+                    Language family comparison for this value
+                  </div>
+                  <FamilyBarChart languages={langs} />
+                </div>
               </>
             );
           })()

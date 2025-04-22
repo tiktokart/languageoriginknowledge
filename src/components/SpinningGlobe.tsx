@@ -1,17 +1,30 @@
 
-import React, { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Sphere, Html } from "@react-three/drei";
+import React from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Sphere } from "@react-three/drei";
+import * as THREE from "three";
 
-const Globe = () => {
-  const meshRef = useRef<THREE.Mesh>(null!);
+// Separate GlobeObject component that will live inside the Canvas
+const GlobeObject: React.FC = () => {
+  const meshRef = React.useRef<THREE.Mesh>(null!);
 
-  // Animate rotation of globe
-  useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.0032;
-    }
-  });
+  // Animate rotation of globe - using useFrame which must be inside Canvas
+  React.useEffect(() => {
+    let animationId: number;
+    
+    const animate = () => {
+      if (meshRef.current) {
+        meshRef.current.rotation.y += 0.0032;
+      }
+      animationId = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
 
   // Several "lights" as glowing points (using colored Spheres)
   // Example: 8 random locations, with colors from palette
@@ -37,7 +50,7 @@ const Globe = () => {
     ] as [number, number, number];
   };
 
-  // Animated light scale for pulsing effect
+  // Animated light component - now uses useEffect for animation instead of useFrame
   function AnimatedLight({
     position,
     color,
@@ -47,21 +60,62 @@ const Globe = () => {
     color: string;
     i: number;
   }) {
-    const lightRef = useRef<THREE.Mesh>(null!);
-    useFrame(({ clock }) => {
-      if (lightRef.current) {
-        const t = clock.getElapsedTime() + i;
-        lightRef.current.scale.setScalar(0.5 + Math.abs(Math.sin(t * 1.7)) * 1.1);
-      }
-    });
+    const lightRef = React.useRef<THREE.Mesh>(null!);
+    
+    React.useEffect(() => {
+      let animationId: number;
+      let startTime = Date.now();
+      
+      const animate = () => {
+        if (lightRef.current) {
+          const t = (Date.now() - startTime) / 1000 + i;
+          lightRef.current.scale.setScalar(0.5 + Math.abs(Math.sin(t * 1.7)) * 1.1);
+        }
+        animationId = requestAnimationFrame(animate);
+      };
+      
+      animate();
+      
+      return () => {
+        cancelAnimationFrame(animationId);
+      };
+    }, [i]);
+    
     return (
       <mesh ref={lightRef} position={position}>
         <sphereGeometry args={[0.08, 18, 16]} />
-        <meshBasicMaterial color={color} emissive={color} />
+        <meshBasicMaterial color={color} />
       </mesh>
     );
   }
 
+  return (
+    <group ref={meshRef}>
+      {/* Sphere with blue/purple gradient */}
+      <Sphere args={[1.2, 48, 32]}>
+        <meshStandardMaterial
+          color="#364182"
+          roughness={0.35}
+          metalness={0.11}
+          transparent
+          opacity={0.98}
+        />
+      </Sphere>
+      {/* Animated language "lights" */}
+      {lights.map((pt, i) => (
+        <AnimatedLight
+          key={i}
+          i={i}
+          color={pt.color}
+          position={latLngToXYZ(pt.lat, pt.lng, 1.23)}
+        />
+      ))}
+    </group>
+  );
+};
+
+// Main component that wraps everything in Canvas
+const SpinningGlobe: React.FC = () => {
   return (
     <Canvas
       camera={{ position: [0, 0, 3.8], fov: 38 }}
@@ -71,27 +125,7 @@ const Globe = () => {
       <ambientLight intensity={0.32} />
       <directionalLight position={[-5, 3, 5]} intensity={0.45} color={"#ffe3b8"} />
       <directionalLight position={[6, -2, -8]} intensity={0.27} color={"#6493f7"} />
-      <group ref={meshRef}>
-        {/* Sphere with blue/purple gradient */}
-        <Sphere args={[1.2, 48, 32]}>
-          <meshStandardMaterial
-            color="#364182"
-            roughness={0.35}
-            metalness={0.11}
-            transparent
-            opacity={0.98}
-          />
-        </Sphere>
-        {/* Animated language "lights" */}
-        {lights.map((pt, i) => (
-          <AnimatedLight
-            key={i}
-            i={i}
-            color={pt.color}
-            position={latLngToXYZ(pt.lat, pt.lng, 1.23)}
-          />
-        ))}
-      </group>
+      <GlobeObject />
       {/* Subtle shadow under globe */}
       <mesh position={[0, -1.34, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[1.1, 36]} />
@@ -103,4 +137,4 @@ const Globe = () => {
   );
 };
 
-export default Globe;
+export default SpinningGlobe;

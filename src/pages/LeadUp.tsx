@@ -1,10 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Globe, ArrowRight } from "lucide-react";
-
-// Placeholder globe gif from Unsplash (replace with your own if needed)
-const GLOBE_GIF =
-  "https://media.giphy.com/media/SKGo6OYe24EBG/giphy.gif"; // Use a custom gif if desired
+import GlobeWithPulsingLights from "../components/GlobeWithPulsingLights";
 
 export default function LeadUp() {
   const navigate = useNavigate();
@@ -12,13 +9,7 @@ export default function LeadUp() {
   return (
     <div className="w-full min-h-screen bg-[#1A1F2C] flex items-center justify-center">
       <div className="relative w-full max-w-xl h-[400px] flex items-center justify-center">
-        {/* Globe GIF */}
-        <img
-          src={GLOBE_GIF}
-          alt="Animated Spinning Globe"
-          className="w-full h-full object-contain pointer-events-none select-none rounded-3xl shadow-xl animate-fade-in"
-          draggable={false}
-        />
+        <GlobeWithPulsingLights />
         {/* Button Overlay */}
         <button
           onClick={() => navigate("/visualization")}

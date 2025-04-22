@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import ExpandableLanguageList from "./ExpandableLanguageList";
 import FeatureValueChart from "./FeatureValueChart";
 import FamilyBarChart from "./FamilyBarChart";
+import FeatureContextBox from "./FeatureContextBox";
 
 const MAJOR_CATEGORIES = [
   "Phonology",
@@ -198,6 +199,7 @@ const FeatureTreeAnalysisDialog = () => {
         <DialogTitle className="text-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-purple-500 mb-2">
           All Languages: Feature Family Tree Analysis
         </DialogTitle>
+        <FeatureContextBox />
         <p className="text-center text-xs opacity-60 mb-5">
           2D tree diagram visualization: languages grouped by major structural attributes.
         </p>

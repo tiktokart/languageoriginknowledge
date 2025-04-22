@@ -8,8 +8,8 @@ interface Language {
 }
 
 interface FeatureValueChartProps {
-  // For main breakdown chart in FeatureTreeAnalysisDialog
   languagesGroupedByValue: Record<string, Language[]>;
+  onBarClick?: (value: string, languages: Language[]) => void;
 }
 
 // More visually distinct color palette if needed
@@ -32,9 +32,9 @@ function getSortedValueData(languagesGroupedByValue: Record<string, Language[]>)
     .sort((a, b) => b.count - a.count);
 }
 
-// For backward compatibility, still allow the old usage for just a list of languages (should rarely be used now)
 const FeatureValueChart: React.FC<FeatureValueChartProps> = ({
-  languagesGroupedByValue
+  languagesGroupedByValue,
+  onBarClick,
 }) => {
   if (!languagesGroupedByValue || !Object.keys(languagesGroupedByValue).length) return null;
 
@@ -50,6 +50,13 @@ const FeatureValueChart: React.FC<FeatureValueChartProps> = ({
           data={data}
           layout="vertical"
           margin={{ left: 10, right: 10, top: 10, bottom: 10 }}
+          onClick={e => {
+            if (!onBarClick || !e?.activeLabel) return;
+            const value = e.activeLabel;
+            if (languagesGroupedByValue[value]) {
+              onBarClick(value, languagesGroupedByValue[value]);
+            }
+          }}
         >
           <XAxis
             type="number"
@@ -78,9 +85,16 @@ const FeatureValueChart: React.FC<FeatureValueChartProps> = ({
               fill: "#555"
             }}
           />
-          <Bar dataKey="count" isAnimationActive={false}>
+          <Bar dataKey="count" isAnimationActive={false}
+            onClick={(_, idx) => {
+              if (!onBarClick) return;
+              const value = data[idx].value;
+              if (languagesGroupedByValue[value]) {
+                onBarClick(value, languagesGroupedByValue[value]);
+              }
+            }}>
             {data.map((entry, idx) => (
-              <Cell key={entry.value} fill={COLORS[idx % COLORS.length]} />
+              <Cell key={entry.value} fill={COLORS[idx % COLORS.length]} cursor={onBarClick ? "pointer" : "default"} />
             ))}
             <LabelList dataKey="count" position="right" fontSize={11} fill="#333" />
           </Bar>
@@ -97,6 +111,9 @@ const FeatureValueChart: React.FC<FeatureValueChartProps> = ({
           />
         </BarChart>
       </ResponsiveContainer>
+      {onBarClick && (
+        <div className="text-xs text-center mt-2 text-slate-600">Click a bar to see all languages for a value</div>
+      )}
     </div>
   );
 };

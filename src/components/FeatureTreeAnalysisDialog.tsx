@@ -6,13 +6,15 @@ import {
   DialogTrigger,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Grid2x2 } from "lucide-react";
+import { Grid2x2, GitBranch } from "lucide-react";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import ExpandableLanguageList from "./ExpandableLanguageList";
 import FeatureValueChart from "./FeatureValueChart";
 import FamilyBarChart from "./FamilyBarChart";
 import FeatureContextBox from "./FeatureContextBox";
+import LanguageListDialog from "./LanguageListDialog";
+import FamilyLineageDialog from "./FamilyLineageDialog";
 
 const MAJOR_CATEGORIES = [
   "Phonology",
@@ -23,9 +25,7 @@ const MAJOR_CATEGORIES = [
   "Nominal Categories",
 ];
 
-// Helper: Known linear orders for certain category values
 const KNOWN_ORDERS: Record<string, string[]> = {
-  // Example for "Phonology" - "Vowel Quality Inventory"
   "Vowel Quality Inventory": [
     "Small",
     "Average",
@@ -33,7 +33,6 @@ const KNOWN_ORDERS: Record<string, string[]> = {
     "Large",
     "Very Large (>14)"
   ],
-  // Expand with other features as needed:
   "Consonant Inventories": [
     "Small",
     "Moderately small",
@@ -48,7 +47,6 @@ const KNOWN_ORDERS: Record<string, string[]> = {
     "Complex",
     "Highly complex"
   ],
-  // Add more known orders here as detected in your dataset
 };
 
 function sortValuesLinearlyOrAlphabetically(featureName: string, values: Record<string, unknown>) {
@@ -56,10 +54,8 @@ function sortValuesLinearlyOrAlphabetically(featureName: string, values: Record<
   const keys = Object.keys(values);
 
   if (linearOrder) {
-    // Order according to known linear order
     return [...linearOrder.filter((v) => keys.includes(v)), ...keys.filter((v) => !linearOrder.includes(v)).sort()];
   } else {
-    // Fallback: sort values alphabetically
     return keys.sort();
   }
 }
@@ -86,17 +82,17 @@ function buildFeatureTree(languages: Language[]) {
   return tree;
 }
 
-interface TreeDiagramProps {
-  tree: ReturnType<typeof buildFeatureTree>;
-}
-
-const TreeDiagram = ({ tree }: TreeDiagramProps) => {
+const TreeDiagram = ({ tree }) => {
   const [openCategory, setOpenCategory] = useState<string | null>(null);
   const [activeGraph, setActiveGraph] = useState<{
     category: string;
     feature: string;
     value: string;
   } | null>(null);
+
+  const [langListOpen, setLangListOpen] = useState(false);
+  const [langListValue, setLangListValue] = useState<string>("");
+  const [langListLanguages, setLangListLanguages] = useState<Language[]>([]);
 
   useEffect(() => {
     setActiveGraph(null);
@@ -196,6 +192,11 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
                   languagesGroupedByValue={
                     tree[activeGraph.category][activeGraph.feature]
                   }
+                  onBarClick={(value, langsForValue) => {
+                    setLangListValue(value);
+                    setLangListLanguages(langsForValue);
+                    setLangListOpen(true);
+                  }}
                 />
 
                 <div>
@@ -204,6 +205,12 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
                   </div>
                   <FamilyBarChart languages={langs} />
                 </div>
+                <LanguageListDialog
+                  open={langListOpen}
+                  onOpenChange={setLangListOpen}
+                  valueLabel={langListValue}
+                  languages={langListLanguages}
+                />
               </>
             );
           })()
@@ -220,6 +227,7 @@ const TreeDiagram = ({ tree }: TreeDiagramProps) => {
 const FeatureTreeAnalysisDialog = () => {
   const [languages, setLanguages] = useState<Language[]>([]);
   const [open, setOpen] = useState(false);
+  const [lineageOpen, setLineageOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -241,9 +249,19 @@ const FeatureTreeAnalysisDialog = () => {
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-6xl bg-white/90 text-black px-4 py-6 overflow-y-auto max-h-[90vh]">
-        <DialogTitle className="text-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-purple-500 mb-2">
-          All Languages: Feature Family Tree Analysis
-        </DialogTitle>
+        <div className="flex items-center justify-between">
+          <DialogTitle className="text-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-purple-500 mb-2">
+            All Languages: Feature Family Tree Analysis
+          </DialogTitle>
+          <button
+            className="flex items-center gap-1 text-xs bg-blue-100 rounded px-2.5 py-1 border border-blue-300 hover:bg-blue-200 transition-colors"
+            onClick={() => setLineageOpen(true)}
+            title="View family lineage for all languages"
+          >
+            <GitBranch size={14} className="text-blue-700" />
+            Family Lineage
+          </button>
+        </div>
         <FeatureContextBox />
         <p className="text-center text-xs opacity-60 mb-5">
           2D tree diagram visualization: languages grouped by major structural attributes.
@@ -256,6 +274,11 @@ const FeatureTreeAnalysisDialog = () => {
         <div className="mt-8 text-center text-xs opacity-40">
           Collapsible tree view by attribute category &bull; Click feature values for colored language charts
         </div>
+        <FamilyLineageDialog
+          open={lineageOpen}
+          onOpenChange={setLineageOpen}
+          languages={languages}
+        />
       </DialogContent>
     </Dialog>
   );

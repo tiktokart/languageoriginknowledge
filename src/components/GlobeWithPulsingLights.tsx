@@ -1,23 +1,20 @@
 
 import React from "react";
 
-// We use your reference image as background
-const GLOBE_SRC = "/lovable-uploads/ecf1daa8-4337-416c-ba26-33f44076e935.png";
+// Use your provided Google Earth globe image
+const GLOBE_SRC = "/lovable-uploads/eef11f14-27f7-447c-8398-6b3231c6b7b9.png";
 
-// These positions (percentages) approximate "hotspots" on the globe from your reference image.
-// You can tweak/add more dots by adjusting the array.
+// Dots: (left, top, color), adjust as needed for representative distribution
 const DOTS = [
-  //             left,   top
-  { left: "58%", top: "36%", color: "rgba(245, 34, 45, 0.75)" }, // India
-  { left: "38%", top: "28%", color: "rgba(168, 85, 247, 0.65)" }, // Europe/Near East
-  { left: "69%", top: "54%", color: "rgba(244, 63, 94, 0.7)" }, // Southern China
-  { left: "36%", top: "45%", color: "rgba(245, 34, 45, 0.3)" }, // Africa
-  { left: "79%", top: "74%", color: "rgba(139, 92, 246, 0.55)" }, // Indonesia area
-  { left: "60%", top: "80%", color: "rgba(168, 85, 247, 0.4)" }, // North Australia
-  { left: "28%", top: "60%", color: "rgba(244, 63, 94, 0.35)" }, // Madagascar region
-  { left: "54%", top: "52%", color: "rgba(245, 158, 11, 0.4)" }, // Middle East
-  { left: "70%", top: "83%", color: "rgba(34, 211, 238, 0.6)" }, // S. Australia
-  // Add more dots as desired...
+  { left: "58%", top: "38%", color: "#9b87f5" }, // Light Purple
+  { left: "38%", top: "28%", color: "#F97316" }, // Orange
+  { left: "69%", top: "54%", color: "#0EA5E9" }, // Blue
+  { left: "36%", top: "46%", color: "#8B5CF6" }, // Purple
+  { left: "79%", top: "74%", color: "#D946EF" }, // Magenta
+  { left: "60%", top: "80%", color: "#F59E0B" }, // Gold
+  { left: "28%", top: "60%", color: "#34D6E6" }, // Cyan
+  { left: "54%", top: "52%", color: "#ea384c" }, // Red
+  { left: "70%", top: "83%", color: "#1EAEDB" }, // Bright blue
 ];
 
 export default function GlobeWithPulsingLights() {
@@ -25,8 +22,8 @@ export default function GlobeWithPulsingLights() {
     <div className="relative w-full h-[400px] max-w-xl">
       <img
         src={GLOBE_SRC}
-        alt="Spinning Earth Globe"
-        className="w-full h-full object-contain rounded-3xl shadow-lg animate-fade-in pointer-events-none select-none"
+        alt="Google Earth Globe"
+        className="w-full h-full object-contain rounded-3xl shadow-xl pointer-events-none select-none"
         draggable={false}
         style={{ background: "#090f24" }}
       />
@@ -38,12 +35,12 @@ export default function GlobeWithPulsingLights() {
             left: dot.left,
             top: dot.top,
             transform: "translate(-50%, -50%)",
-            width: 32,
-            height: 32,
+            width: 26,
+            height: 26,
             background: dot.color,
             borderRadius: "9999px",
-            filter: "blur(0.5px)",
-            boxShadow: "0 0 12px 6px " + dot.color,
+            filter: "blur(0.3px)",
+            boxShadow: `0 0 12px 6px ${dot.color}`,
             zIndex: 5,
           }}
         />

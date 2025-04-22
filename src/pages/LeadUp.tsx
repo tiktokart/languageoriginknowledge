@@ -8,9 +8,10 @@ export default function LeadUp() {
 
   return (
     <div className="w-full min-h-screen bg-[#1A1F2C] flex items-center justify-center">
-      <div className="relative w-full max-w-2xl flex items-center justify-center" style={{ height: 420 }}>
+      <div className="relative w-full max-w-2xl h-[400px] flex items-center justify-center">
         {/* Spinning Globe */}
         <SpinningGlobe />
+        
         {/* Button Overlay */}
         <button
           onClick={() => navigate("/visualization")}
